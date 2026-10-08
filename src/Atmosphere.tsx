@@ -1,0 +1,8 @@
+import {useFrame,useThree} from '@react-three/fiber';
+import {useMemo,useRef} from 'react';
+import {Color,DirectionalLight,Group,Vector3} from 'three';
+import {controls,useGame} from './game';
+export function Atmosphere(){const scene=useThree(s=>s.scene),sun=useRef<DirectionalLight>(null),rain=useRef<Group>(null),target=useMemo(()=>new Vector3(),[]),sky=useMemo(()=>new Color(),[]);const drops=useMemo(()=>Array.from({length:70},(_,i)=>[(i*7.13)%30-15,(i*3.17)%15,(i*11.27)%30-15] as [number,number,number]),[]);
+ useFrame(({clock},dt)=>{const g=useGame.getState().game,hour=g.minutes/60,daylight=Math.max(.12,Math.sin((hour-6)/12*Math.PI)),wet=g.day%3===0;sky.setRGB(.12+daylight*.45,.18+daylight*.48,.28+daylight*.42);scene.background=sky;if(scene.fog)scene.fog.color.copy(sky);if(sun.current){sun.current.intensity=daylight*2.5;sun.current.position.set(controls.position[0]-15,24,controls.position[1]+10);target.set(controls.position[0],0,controls.position[1]);sun.current.target.position.copy(target);sun.current.target.updateMatrixWorld();}if(rain.current){rain.current.visible=wet&&!g.interior;rain.current.position.set(controls.position[0],0,controls.position[1]);rain.current.children.forEach((n,i)=>{n.position.y=(drops[i][1]-clock.elapsedTime*9)%15+15;});}void dt;});
+ return <><directionalLight ref={sun} castShadow={useGame(s=>s.quality)==='high'} shadow-mapSize={[1024,1024]} shadow-camera-left={-24} shadow-camera-right={24} shadow-camera-top={24} shadow-camera-bottom={-24} shadow-bias={-.001}/><group ref={rain}>{drops.map((p,i)=><mesh key={i} position={p}><boxGeometry args={[.015,.45,.015]}/><meshBasicMaterial color="#c3d7ed" transparent opacity={.45}/></mesh>)}</group></>;
+}

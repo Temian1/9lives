@@ -1,0 +1,7 @@
+import {useEffect,useRef} from 'react';
+import {useFrame} from '@react-three/fiber';
+import {Group} from 'three';
+import {controls,useGame} from './game';
+import {usePeers} from './peer';
+import {Person,Sign} from './SceneParts';
+export function Bodyguards(){const count=useGame(s=>s.game.guards??0),mode=useGame(s=>s.game.sim?.guardMode??'protect'),refs=useRef<(Group|null)[]>([]),anchor=useRef<[number,number]>([...controls.position]);useEffect(()=>{anchor.current=[...controls.position];},[mode]);useFrame((_,dt)=>{const s=useGame.getState(),peers=usePeers.getState(),threat=peers.players.find(p=>p.id!==peers.id&&p.wanted>0&&Math.hypot(p.x-controls.position[0],p.z-controls.position[1])<8);refs.current.forEach((g,i)=>{if(!g)return;g.visible=!s.game.interior&&!s.driving&&!s.ride&&s.game.lives>0;if(s.modal||s.paused)return;let x=(mode==='stay'?anchor.current[0]:controls.position[0])+(i%2?1.4:-1.4),z=(mode==='stay'?anchor.current[1]:controls.position[1])-1.2-i*.7;if(mode==='protect'&&threat){x=(threat.x+controls.position[0])/2+(i-1)*.8;z=(threat.z+controls.position[1])/2;}const dx=x-g.position.x,dz=z-g.position.z,step=1-Math.exp(-dt*4);g.position.x+=dx*step;g.position.z+=dz*step;if(Math.hypot(dx,dz)>.05)g.rotation.y=Math.atan2(dx,dz);});});return <>{Array.from({length:count},(_,i)=><group key={i} ref={g=>{refs.current[i]=g;}} position={[controls.position[0]+i,0,controls.position[1]-2]}><Person npc color="#3d5145"/><Sign text={mode==='stay'?'GUARD · HOLD':'BODYGUARD'} position={[0,2.2,0]} width={1.5}/></group>)}</>;}

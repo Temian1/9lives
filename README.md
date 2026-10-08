@@ -1,6 +1,6 @@
 # 9LIVES — Expanded Lagos
 
-A browser survival RPG built with React 19, TypeScript, Vite, Three.js, React Three Fiber, and Zustand. Procedural low-poly art avoids external model downloads. Portrait, landscape, keyboard, and touch controls are supported.
+A browser survival RPG built with React 19, TypeScript, Vite, Three.js, React Three Fiber, and Zustand. Bundled licensed GLB models upgrade the stylized world, furniture and animated characters. Portrait, landscape, keyboard, and touch controls are supported.
 
 ## Run
 
@@ -24,7 +24,7 @@ Open the URL Vite prints. Phones on the same Wi-Fi can use the LAN URL. `npm run
 - Buy houses and district land plots; build a house, club, church or shop, and upgrade three levels. Use Properties to browse prices, then walk to a home entrance to enter.
 - Furnished cutaway home interiors: walk around, tap furniture or use Sit, Sleep and Watch TV. Buy a sofa, bed, TV, kitchen, table and plant; purchases and interior state persist locally.
 - Rotating/pinching touch camera, mouse right-drag and wheel zoom, transparent mobile stats collapsed by default.
-- Hawkers sell supplies, motor parks have boarding rings, Mainland Motors displays vehicles, and roadside billboards advertise the districts. The Radio button plays an original synthesized instrumental loop after a user gesture.
+- Hawkers sell supplies, motor parks have boarding rings, Mainland Motors displays vehicles, and roadside billboards advertise the districts. The Music button plays licensed recordings after a user gesture. Life & jobs → Music & club playlist lets you choose tracks or import your permitted MP3/OGG/WAV files.
 - Police/EFCC patrols pursue wanted players. Capture deducts the fine, advances two hours and returns you to the police station. Selling the evidence creates a wanted level.
 - Animated loading screen and responsive character preview.
 
@@ -36,7 +36,7 @@ Open the URL Vite prints. Phones on the same Wi-Fi can use the LAN URL. `npm run
 4. **Survival Costs Money**: take the ledger to Ikeja. Report it to the EFCC or sell it for more cash and a wanted level.
 5. **Nine Chances**: visit Island Logistics in Victoria Island. Your earlier choice determines the final contract and ending.
 
-Payments are gated by stage. Five survival stats share one simulation engine. Rotated vehicle footprints, swept movement and shared building/stall bounds prevent clipping. Equal lane speeds and separation checks keep traffic from overtaking through cars; traffic yields to the player vehicle. Low graphics disables shadows and caps resolution. Physical Android performance profiling, rigged GLB animations, and full NPC schedules remain future work.
+Payments are gated by stage. Five survival stats share one simulation engine. Rotated vehicle footprints, swept movement and shared building/stall bounds prevent clipping. Equal lane speeds and separation checks keep traffic from overtaking through cars; traffic yields to the player vehicle. Low graphics disables shadows and caps resolution. Animated GLB characters and daytime sidewalk pedestrians are included. Full individual NPC schedules and physical Android performance profiling remain future work.
 
 ## Controls and saves
 
@@ -44,20 +44,38 @@ WASD/arrows move, Shift runs/accelerates, E interacts, M opens the city map, I o
 
 Validated IndexedDB saves remain on this browser/device. Old v0.1 saves migrate to a guest profile. Manual save, minute autosave, and save-on-hide are supported. Simulation and trips pause in dialogs, paused state, and hidden tabs. The kidnapping timer continues through its ransom dialog but pauses with the game or hidden tab. The one-hour campaign break uses wall-clock time, including time offline. No offline time penalty or cloud sync.
 
-## Multiplayer and online accounts: coming soon, inactive
+## New life simulation
 
-The UI marks real-player chat, teams, combat, robbery, gifting, and optional online accounts **Coming soon**. It makes no online-server requests or simulated-player claims. Pistols are purchasable equipment; player shooting belongs to the future shared-city mode.
+New campaigns start with ₦1,000,000. Older saves receive a one-time starter-fund migration marked in saved flags. **Life & jobs** opens playable delivery/taxi jobs (pickup and destination), repair/shop task sequences, banks/loans/bills, health/hygiene/storage, property management, vehicle care, music and friends multiplayer.
 
-A separately runnable Node/WebSocket backend is included, disabled by default:
+Available homes can be rented with the first week's rent and two weeks' deposit. Weekly arrears generate notices and landlord messages; negotiate once per day, pay arrears or end your lease. Three unpaid cycles cause eviction. Owned houses can be let to tenants for weekly income. Sell any owned property for 70% of catalog value including furniture/improvements; sale removes access and business records.
 
-```sh
-npm run server
-```
+Enter any owned building or rented home at its entrance. Homes support cooking, bathing, cleaning, exercise and storage alongside sitting/sleeping/TV. Clubs, churches and shops have themed fixtures and can be furnished. Position furniture and construct/move/rotate room dividers in the editor. Business stock/staff produce daily income minus wages. This economy is abstract; customers do not yet trade individually simulated items.
 
-`GET /api/status` reports `coming-soon`; account routes and socket upgrades are rejected until explicitly enabled. `.env.example` documents settings. The server uses process environment variables; it does not automatically load `.env` files.
+Hospitals sell one **in-game life** for ₦25,000, maximum nine. No real-money purchase occurs and zero lives cannot bypass the one-hour break. Fuel, condition and parking coordinates persist for owned vehicles; find them in Vehicle care. Vehicles accelerate and decelerate, with Space braking on keyboard and joystick-release deceleration on touch. Day/night lighting follows the player; every third game day brings rain.
 
-For future development, `MULTIPLAYER_ENABLED=true` activates only the backend, not the current client UI. It supports email-free guests, optional username/password accounts with optional email, scrypt hashes, expiring HttpOnly sessions, request limits, authenticated sockets, authoritative movement/purchases/combat, safe zones, guard protection, team invitations, gifts, low-health robbery, and life transfers on a lethal attack (attacker capped at nine), and a server-enforced one-hour exhaustion break. The `restart` message only succeeds after that deadline. Account/player data persists in `.data/`, excluded from Git.
+## Friends multiplayer — direct browser connection
 
-HTTP: `POST /api/guest`, `/api/register`, `/api/login`, `/api/logout`. Authenticated WebSocket: `/ws`. Messages: `move`, `chat`, `buy`, `work`, `open-gift`, `invite`, `accept-team`, `gift`, `attack`, `rob`, `restart`. World snapshots broadcast every 200 ms.
+Open **Friends online → Host or join a room**, also under Life & jobs. The host generates an invitation code and sends it to one friend. The friend pastes it, joins, and sends the reply code back. The host accepts that reply. Create a fresh invitation for each additional friend; maximum eight players.
 
-A future online launch needs client-server integration, WebSocket hosting, a production database, HTTPS/secure cookies, origin configuration, moderation, and deployment testing. This release keeps multiplayer and online authentication inactive as requested.
+WebRTC data channels synchronize visible players, movement, chat, teams, cash/items, gun attacks, low-health robbery and life transfers. Gifts require proximity; safe zones and teammates are protected. Ammunition is consumed and armor/bodyguards reduce damage. Lethal attacks transfer a life up to nine. Keep the host tab open; leaving ends the room.
+
+Opening the same URL alone does **not** discover players. Pairing uses Google's public STUN service; restrictive NAT/mobile networks may need a TURN relay, which is not configured. Manual pairing and chat were checked between isolated browser contexts, not across every carrier. The host processes combat, but solo simulation changes are trusted: these are private friends sessions, not cheat-resistant public servers. Room history is not cloud saved. Use HTTPS (or localhost); LAN HTTP may restrict browser APIs.
+
+## Optional online backend — disabled / coming soon
+
+`npm run server` starts the separately included Node/WebSocket backend. By default, /api/status reports coming-soon and account/socket routes are inactive. .env.example describes the explicit enable flag. Optional email-free guests and username/password accounts remain prepared for a later hosted launch. Public-server deployment still needs client integration, persistent shared data, HTTPS/cookies, origin configuration, moderation and anti-cheat.
+
+## Music and model credits
+
+**Beauty Flow** and **Carefree** are real recordings by Kevin MacLeod ([incompetech](https://incompetech.com/music/royalty-free/)), used unmodified under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Exact track sources and attribution are in public/assets/licenses/music.txt and the music player. Audio is loaded only when played. Up to twenty permitted recordings can be imported into device storage; format support depends on the browser. Commercial artist tracks require permission and are not bundled.
+
+Bundled Kenney models: [Blocky Characters](https://kenney.nl/assets/blocky-characters), [City Kit Commercial](https://kenney.nl/assets/city-kit-commercial), [City Kit Suburban](https://kenney.nl/assets/city-kit-suburban), [Furniture Kit](https://kenney.nl/assets/furniture-kit). CC0 license files are in public/assets/licenses/. Texture references were relocated to local bundled texture folders. No runtime asset CDN is needed.
+
+Add licensed GLBs to public/assets/models/ and use Asset or RiggedPerson to expand the art. Fit model dimensions to shared collider bounds and keep source/license records. The character studio offers eight models, appearance colors, hairstyles, accessories and height/build controls. Graphics are stylized rather than photorealistic.
+
+## Offline and remaining limits
+
+The production service worker caches the shell and successfully visited code/models. Visit the game and districts online first; unvisited assets are not predownloaded. Recorded music is excluded from offline caching. Imported songs remain on their original device. The manifest permits either orientation; development does not register the service worker.
+
+This is a playable prototype. Full career trees, individual NPC home/work calendars, persistent shared construction, advanced suspension, terrain streaming, detailed crime evidence/witness simulation, melee/cover combat, visitor AI and physical Android long-session profiling remain future work. Repair/shop jobs are ordered task menus rather than physics simulations. Delivery/taxi jobs use pickup/destination checks. Automated tests cover campaign/survival/collisions/purchases/room rules plus landlord eviction, resale, banking, jobs and malformed nested saves. Browser checks cover desktop/mobile layouts, property entry, asset loading, direct pairing and chat.

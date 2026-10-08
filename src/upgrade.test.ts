@@ -19,23 +19,25 @@ test('traffic spacing remains safe over time and districts have different skylin
   assert.equal(new Set(districts.map(d=>blockers.filter(b=>b.district===d.id).length)).size,6);
 });
 test('purchase land, build once, buy furniture once, enter nearby owned houses, and validate saves',()=>{
-  useGame.setState({game:{...fresh(),created:true,money:100000},ride:null,driving:null});
+  useGame.setState({game:{...fixture(),created:true,money:100000},ride:null,driving:null});
   const s=useGame.getState();s.propertyAction('plot-ikorodu','buy');s.propertyAction('plot-ikorodu','house');const cash=useGame.getState().game.money;s.propertyAction('plot-ikorodu','house');assert.equal(useGame.getState().game.money,cash);
   s.propertyAction('plot-ikorodu','bed');const after=useGame.getState().game.money;s.propertyAction('plot-ikorodu','bed');assert.equal(useGame.getState().game.money,after);
   controls.position=[0,6];s.propertyAction('plot-ikorodu','enter');assert.equal(useGame.getState().game.interior,undefined);
   const parcel=parcels.find(p=>p.id==='plot-ikorodu')!;controls.position=entrance(parcel);s.update(g=>({...g,position:entrance(parcel)}));s.propertyAction(parcel.id,'enter');assert.equal(useGame.getState().game.interior,parcel.id);assert.ok(validSave(useGame.getState().game));s.homeAction('sleep');assert.equal(useGame.getState().game.pose,'sleep');s.propertyAction(parcel.id,'exit');assert.equal(useGame.getState().game.interior,undefined);
-  assert.equal(validSave({...fresh(),properties:[starterProperty(),starterProperty()]}),false);
+  assert.equal(validSave({...fixture(),properties:[starterProperty(),starterProperty()]}),false);
 });
 test('kidnapping ransom and rescue remove captivity; unpaid deadline consumes a life',()=>{
   const previous=globalThis.document;Object.defineProperty(globalThis,'document',{value:{hidden:false},configurable:true});
-  try{useGame.setState({game:{...fresh(),created:true,stage:'ledger'},ride:null,paused:false});const s=useGame.getState();s.story('kidnap');assert.equal(useGame.getState().game.captivity?.remaining,60);s.story('ransom');assert.equal(useGame.getState().game.money,2000);assert.equal(useGame.getState().game.captivity,undefined);s.story('kidnap');s.story('rescue');assert.equal(useGame.getState().game.relationships.amara,40);s.story('kidnap');s.update(g=>({...g,captivity:{remaining:1,ransom:3000}}));s.tick();assert.equal(useGame.getState().game.lives,8);assert.equal(useGame.getState().game.captivity,undefined);assert.equal(useGame.getState().game.deathCause,'Unpaid kidnapping ransom');}
+  try{useGame.setState({game:{...fixture(),created:true,stage:'ledger'},ride:null,paused:false});const s=useGame.getState();s.story('kidnap');assert.equal(useGame.getState().game.captivity?.remaining,60);s.story('ransom');assert.equal(useGame.getState().game.money,2000);assert.equal(useGame.getState().game.captivity,undefined);s.story('kidnap');s.story('rescue');assert.equal(useGame.getState().game.relationships.amara,40);s.story('kidnap');s.update(g=>({...g,captivity:{remaining:1,ransom:3000}}));s.tick();assert.equal(useGame.getState().game.lives,8);assert.equal(useGame.getState().game.captivity,undefined);assert.equal(useGame.getState().game.deathCause,'Unpaid kidnapping ransom');}
   finally{Object.defineProperty(globalThis,'document',{value:previous,configurable:true});}
 });
 test('zero lives starts a one-hour break and reset cannot bypass it',()=>{
-  const before=Date.now(),dead=loseLife({...fresh(),lives:1});assert.ok(dead.breakUntil!>=before+3600000);assert.ok(validSave(dead));useGame.setState({game:dead});useGame.getState().reset();assert.equal(useGame.getState().game.lives,0);
+  const before=Date.now(),dead=loseLife({...fixture(),lives:1});assert.ok(dead.breakUntil!>=before+3600000);assert.ok(validSave(dead));useGame.setState({game:dead});useGame.getState().reset();assert.equal(useGame.getState().game.lives,0);
 });
 test('patrol arrest clears wanted status, charges fine, and returns to police',()=>{
-  useGame.setState({game:{...fresh(),created:true,wanted:3},ride:null});useGame.getState().arrest();const g=useGame.getState().game;assert.equal(g.wanted,0);assert.equal(g.money,2000);assert.deepEqual(g.position,[-106,-3]);assert.equal(useGame.getState().modal,'police');assert.ok(validSave(g));
+  useGame.setState({game:{...fixture(),created:true,wanted:3},ride:null});useGame.getState().arrest();const g=useGame.getState().game;assert.equal(g.wanted,0);assert.equal(g.money,2000);assert.deepEqual(g.position,[-106,-3]);assert.equal(useGame.getState().modal,'police');assert.ok(validSave(g));
 });
 
-test('new collision geometry relocates an older save without discarding purchases or story',()=>{const old={...fresh(),position:[17,-32] as [number,number],money:23000,stage:'ledger'};assert.equal(validSave(old),false);const migrated=recoverSavePosition(old);assert.ok(validSave(migrated));assert.equal(migrated.money,23000);assert.equal(migrated.stage,'ledger');assert.deepEqual(migrated.position,[0,12]);assert.equal(validSave(recoverSavePosition({...fresh(),position:[100,100]})),false);});
+test('new collision geometry relocates an older save without discarding purchases or story',()=>{const old={...fixture(),position:[17,-32] as [number,number],money:23000,stage:'ledger'};assert.equal(validSave(old),false);const migrated=recoverSavePosition(old);assert.ok(validSave(migrated));assert.equal(migrated.money,23000);assert.equal(migrated.stage,'ledger');assert.deepEqual(migrated.position,[0,12]);assert.equal(validSave(recoverSavePosition({...fixture(),position:[100,100]})),false);});
+
+function fixture(){return {...fresh(),money:5000};}
