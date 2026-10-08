@@ -40,13 +40,13 @@ Payments are gated by stage. Five survival stats share one simulation engine. Ro
 
 ## Controls and saves
 
-WASD/arrows move, Shift runs/accelerates, E interacts, M opens the city map, I opens the backpack, H opens help, and Escape pauses/closes dialogs. Touch users have a joystick and action buttons. Layouts adapt to portrait and landscape.
+WASD/arrows move, Shift runs/accelerates, E interacts, M opens the city map, I opens the backpack, H opens help, and Escape pauses/closes dialogs. Touch users can tap an open floor or street to walk along a collision-aware route. Hold or drag the lower-left gameplay area to reveal a floating movement joystick; release hides it. Drag the right side to look around, pinch with two camera fingers to zoom, and use the recenter button to reset the view. Movement and camera fingers stay separate. The same joystick steers owned vehicles. Mission directions show a distance and can be tapped to walk toward an entrance. Layouts adapt to portrait and landscape.
 
 Validated IndexedDB saves remain on this browser/device. Old v0.1 saves migrate to a guest profile. Manual save, minute autosave, and save-on-hide are supported. Simulation and trips pause in dialogs, paused state, and hidden tabs. The kidnapping timer continues through its ransom dialog but pauses with the game or hidden tab. The one-hour campaign break uses wall-clock time, including time offline. No offline time penalty or cloud sync.
 
 ## New life simulation
 
-New campaigns start with ₦1,000,000. Older saves receive a one-time starter-fund migration marked in saved flags. **Life & jobs** opens playable delivery/taxi jobs (pickup and destination), repair/shop task sequences, banks/loans/bills, health/hygiene/storage, property management, vehicle care, music and friends multiplayer.
+New campaigns start with ₦1,000,000. Older saves receive a one-time starter-fund migration marked in saved flags. **Life & jobs** opens playable delivery/taxi jobs (pickup and destination), repair/shop task sequences, banks/loans/bills, health/hygiene/storage, property management, vehicle care, music and a Coming soon multiplayer panel.
 
 Available homes can be rented with the first week's rent and two weeks' deposit. Weekly arrears generate notices and landlord messages; negotiate once per day, pay arrears or end your lease. Three unpaid cycles cause eviction. Owned houses can be let to tenants for weekly income. Sell any owned property for 70% of catalog value including furniture/improvements; sale removes access and business records.
 
@@ -54,13 +54,9 @@ Enter any owned building or rented home at its entrance. Homes support cooking, 
 
 Hospitals sell one **in-game life** for ₦25,000, maximum nine. No real-money purchase occurs and zero lives cannot bypass the one-hour break. Fuel, condition and parking coordinates persist for owned vehicles; find them in Vehicle care. Vehicles accelerate and decelerate, with Space braking on keyboard and joystick-release deceleration on touch. Day/night lighting follows the player; every third game day brings rain.
 
-## Friends multiplayer — direct browser connection
+## Multiplayer — Coming soon
 
-Open **Friends online → Host or join a room**, also under Life & jobs. The host generates an invitation code and sends it to one friend. The friend pastes it, joins, and sends the reply code back. The host accepts that reply. Create a fresh invitation for each additional friend; maximum eight players.
-
-WebRTC data channels synchronize visible players, movement, chat, teams, cash/items, gun attacks, low-health robbery and life transfers. Gifts require proximity; safe zones and teammates are protected. Ammunition is consumed and armor/bodyguards reduce damage. Lethal attacks transfer a life up to nine. Keep the host tab open; leaving ends the room.
-
-Opening the same URL alone does **not** discover players. Pairing uses Google's public STUN service; restrictive NAT/mobile networks may need a TURN relay, which is not configured. Manual pairing and chat were checked between isolated browser contexts, not across every carrier. The host processes combat, but solo simulation changes are trusted: these are private friends sessions, not cheat-resistant public servers. Room history is not cloud saved. Use HTTPS (or localhost); LAN HTTP may restrict browser APIs.
+Multiplayer is inactive for this release, as requested. Opening the website on another phone does not create a shared session. The UI shows Coming soon and has no invitation-code flow. Existing experimental peer code and backend rules remain in the repository, but the game does not start a shared connection service. A future hosted connection service can support automatic discovery without join codes.
 
 ## Optional online backend — disabled / coming soon
 
@@ -78,4 +74,4 @@ Add licensed GLBs to public/assets/models/ and use Asset or RiggedPerson to expa
 
 The production service worker caches the shell and successfully visited code/models. Visit the game and districts online first; unvisited assets are not predownloaded. Recorded music is excluded from offline caching. Imported songs remain on their original device. The manifest permits either orientation; development does not register the service worker.
 
-This is a playable prototype. Full career trees, individual NPC home/work calendars, persistent shared construction, advanced suspension, terrain streaming, detailed crime evidence/witness simulation, melee/cover combat, visitor AI and physical Android long-session profiling remain future work. Repair/shop jobs are ordered task menus rather than physics simulations. Delivery/taxi jobs use pickup/destination checks. Automated tests cover campaign/survival/collisions/purchases/room rules plus landlord eviction, resale, banking, jobs and malformed nested saves. Browser checks cover desktop/mobile layouts, property entry, asset loading, direct pairing and chat.
+This is a playable prototype. Full career trees, individual NPC home/work calendars, persistent shared construction, advanced suspension, terrain streaming, detailed crime evidence/witness simulation, melee/cover combat, visitor AI and physical Android long-session profiling remain future work. Repair/shop jobs are ordered task menus rather than physics simulations. Delivery/taxi jobs use pickup/destination checks. Automated tests cover campaign/survival/collisions/purchases/room rules plus landlord eviction, resale, banking, jobs and malformed nested saves. Browser checks cover desktop/mobile layouts, property purchase/entry, saved deeds, character previews, asset loading, touch controls and tap-to-move.
