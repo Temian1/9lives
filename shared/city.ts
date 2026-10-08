@@ -27,9 +27,32 @@ export const locations: Place[] = [
   place('security','Lekki security','security','lekki',6.1,-4,'Hire bodyguards'),place('lekki-shop','Waterfront market','shop','lekki',-5.8,4,'Equipment & supplies'),place('lekki-home','Guest house','home','lekki',-6,-3,'Rest'),
 ];
 const blocks = [{ x: -9, z: -4, w: 5, d: 6 }, { x: -9, z: 5, w: 5, d: 5 }, { x: 9, z: -4, w: 5, d: 6 }, { x: 9, z: 5, w: 5, d: 5 }, { x: -9, z: -13, w: 5, d: 5 }, { x: 9, z: -13, w: 5, d: 5 }];
-export const blockers = districts.flatMap(d=>blocks.map(b=>({...b,x:b.x+d.x,z:b.z+d.z,district:d.id})));
-export const canMove = (x:number,z:number) => Number.isFinite(x)&&Number.isFinite(z)&&x > -125&&x < 125&&z > -125&&z < 28&&!blockers.some(b=>Math.abs(x-b.x)<b.w/2+.35&&Math.abs(z-b.z)<b.d/2+.35);
-export function trafficAt(time:number) { return Array.from({length:18},(_,i)=>{const lane=i%6,roadX=[-100,0,100][Math.floor(lane/2)],direction=lane%2?1:-1,speed=5+i%4;return {id:i,kind:(['car','bus','bike','keke'] as VehicleKind[])[i%4],x:roadX+(direction>0?-2.3:2.3),z:-123+((time*speed+i*19)%147),angle:direction>0?0:Math.PI,speed,direction};}).map(t=>({...t,z:t.direction>0?t.z:-95-t.z})); }
+export const blockers = districts.flatMap((d, di)=>[
+  ...blocks.map((b,i)=>({...b,x:b.x+d.x,z:b.z+d.z,district:d.id,h:(di===3?12+i*3:di===1?3:di===5?4:6)+i%2,label:['RESIDENCES','MARKET','BUSINESS','HOMES','TRADERS','COMMUNITY'][i],style:di})),
+  ...Array.from({length:[12,18,10,8,14,6][di]},(_,i)=>({x:d.x+(i%2?-1:1)*(17+(Math.floor(i/2)%3)*7),z:d.z-32-Math.floor(i/6)*9,w:di===5?6:4,d:di===4?7:5,district:d.id,h:di===3?14+i*2:di===1?2.6:di===5?4.5:3+i%3,label:['BAKERY','SALON','PHARMACY','TAILOR','CAFE','HOMES'][i%6],style:di})),
+]);
+export const streetObstacles = districts.flatMap(d=>[
+  {x:d.x-8,z:d.z+20,w:2,d:4.1},{x:d.x+8,z:d.z+20,w:1.9,d:3.6},
+  ...Array.from({length:d.id==='ikorodu'?10:d.id==='ikeja'?6:3},(_,i)=>({x:d.x-17-(i%3)*3,z:d.z+2-Math.floor(i/3)*3,w:2.2,d:1.8})),
+]);
+export const canMove = (x:number,z:number) => Number.isFinite(x)&&Number.isFinite(z)&&x > -145&&x < 145&&z > -155&&z < 28&&![...blockers,...streetObstacles].some(b=>Math.abs(x-b.x)<b.w/2+.35&&Math.abs(z-b.z)<b.d/2+.35);
+export function trafficAt(time:number) { return Array.from({length:18},(_,i)=>{const lane=i%6,roadX=[-100,0,100][Math.floor(lane/2)],direction=lane%2?1:-1,speed=6;return {id:i,kind:(['car','bus','bike','keke'] as VehicleKind[])[i%4],x:roadX+(direction>0?-2.3:2.3),z:-123+(((time*speed+Math.floor(i/6)*49)%147)+147)%147,angle:direction>0?0:Math.PI,speed,direction};}).map(t=>({...t,z:t.direction>0?t.z:-99-t.z})); }
+
+export const vehicleSize = (kind: VehicleKind): [number,number] => kind==='bus'?[1,2.05]:kind==='car'?[.95,1.8]:kind==='keke'?[.85,1.3]:[.5,1.3];
+export type Obstacle = {x:number;z:number;w:number;d:number};
+export function overlapsVehicle(x:number,z:number,angle:number,kind:VehicleKind,b:Obstacle) {
+  const [w,d]=vehicleSize(kind),c=Math.cos(angle),s=Math.sin(angle),dx=b.x-x,dz=b.z-z;
+  return Math.abs(dx)<Math.abs(c)*w+Math.abs(s)*d+b.w/2+.08 && Math.abs(dz)<Math.abs(s)*w+Math.abs(c)*d+b.d/2+.08 && Math.abs(dx*c-dz*s)<w+Math.abs(c)*b.w/2+Math.abs(s)*b.d/2+.08 && Math.abs(dx*s+dz*c)<d+Math.abs(s)*b.w/2+Math.abs(c)*b.d/2+.08;
+}
+export function canDrive(x:number,z:number,angle:number,kind:VehicleKind,extra:Obstacle[]=[]) {
+  const [w,d]=vehicleSize(kind),r=Math.hypot(w,d);
+  return Number.isFinite(angle)&&x-r>-145&&x+r<145&&z-r>-155&&z+r<28&&![...blockers,...streetObstacles,...extra].some(b=>overlapsVehicle(x,z,angle,kind,b));
+}
+export function sweptDrive(from:[number,number],to:[number,number],angle:number,kind:VehicleKind,extra:Obstacle[]=[]) {
+  const steps=Math.max(1,Math.ceil(Math.hypot(to[0]-from[0],to[1]-from[1])/.2));
+  for(let i=1;i<=steps;i++)if(!canDrive(from[0]+(to[0]-from[0])*i/steps,from[1]+(to[1]-from[1])*i/steps,angle,kind,extra))return false;
+  return true;
+}
 export const shopItems = [{id:'food',name:'Jollof rice',price:1500},{id:'water',name:'Bottled water',price:300},{id:'medkit',name:'First-aid kit',price:1000},{id:'gun',name:'Pistol',price:4500},{id:'ammo',name:'Ammo pack',price:600},{id:'armor',name:'Protective vest',price:2500},{id:'gift',name:'Mystery gift box',price:800},{id:'guard',name:'Bodyguard contract',price:3000}];
 export const giftRewards = ['Cash', 'First-aid kit', 'Ammo pack', 'Mystery gift box', 'Protective vest', 'Pistol', 'Bodyguard contract', 'Life token', 'Bike key'];
 export const safeZone = (x:number,z:number) => locations.some(l=>['home','hospital','police','efcc','terminal'].includes(l.type)&&Math.hypot(x-l.x,z-l.z)<5);
