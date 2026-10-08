@@ -35,7 +35,7 @@ test('zero lives starts a one-hour break and reset cannot bypass it',()=>{
   const before=Date.now(),dead=loseLife({...fixture(),lives:1});assert.ok(dead.breakUntil!>=before+3600000);assert.ok(validSave(dead));useGame.setState({game:dead});useGame.getState().reset();assert.equal(useGame.getState().game.lives,0);
 });
 test('patrol arrest clears wanted status, charges fine, and returns to police',()=>{
-  useGame.setState({game:{...fixture(),created:true,wanted:3},ride:null});useGame.getState().arrest();const g=useGame.getState().game;assert.equal(g.wanted,0);assert.equal(g.money,2000);assert.deepEqual(g.position,[-106,-3]);assert.equal(useGame.getState().modal,'police');assert.ok(validSave(g));
+  useGame.setState({game:{...fixture(),created:true,wanted:3},ride:null});useGame.getState().arrest();const g=useGame.getState().game;assert.equal(g.wanted,0);assert.equal(g.money,2000);assert.deepEqual(g.position,[-106,-3]);assert.equal(useGame.getState().modal,'enterprise');assert.equal(g.enterprise?.jail?.bail,5000);assert.equal(g.lives,9);assert.ok(validSave(g));
 });
 
 test('new collision geometry relocates an older save without discarding purchases or story',()=>{const old={...fixture(),position:[17,-32] as [number,number],money:23000,stage:'ledger'};assert.equal(validSave(old),false);const migrated=recoverSavePosition(old);assert.ok(validSave(migrated));assert.equal(migrated.money,23000);assert.equal(migrated.stage,'ledger');assert.deepEqual(migrated.position,[0,12]);assert.equal(validSave(recoverSavePosition({...fixture(),position:[100,100]})),false);});

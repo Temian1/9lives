@@ -30,7 +30,7 @@ test('camera stops before buildings but can see over a low obstacle',()=>{
 test('house purchase charges once, clears blocking input and keeps campaign state intact',()=>{
  const g={...fresh(),created:true,stage:'ledger',inventory:['Phone','Evidence ledger']};useGame.setState({game:g,modal:'property',paused:false,ride:null});
  controls.keys.add('w');controls.x=1;controls.route=[[5,5]];controls.destination=[5,5];
- useGame.getState().propertyAction('house-ikorodu','buy');let s=useGame.getState();assert.equal(s.game.money,984000);assert.equal(s.game.stage,'ledger');assert.deepEqual(s.game.inventory,g.inventory);assert.equal(s.modal,null);assert.equal(controls.keys.size,0);assert.equal(controls.x,0);assert.equal(controls.destination,null);
+ useGame.getState().propertyAction('house-ikorodu','buy');let s=useGame.getState();assert.equal(s.game.money,984000);assert.equal(s.game.stage,'ledger');assert.deepEqual(s.game.inventory,[...g.inventory,'Unregistered deed: house-ikorodu']);assert.equal(s.modal,null);assert.equal(controls.keys.size,0);assert.equal(controls.x,0);assert.equal(controls.destination,null);
  s.propertyAction('house-ikorodu','buy');s=useGame.getState();assert.equal(s.game.money,984000);assert.equal(s.game.properties!.filter(p=>p.id==='house-ikorodu').length,1);
 });
 test('construction relocates an overlapping player, preserves distant positions and repairs old saves',()=>{

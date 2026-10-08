@@ -1,0 +1,33 @@
+import {districts,locations,vehicles,districtAt,type VehicleKind} from '../shared/city';
+import {parcels,entrance} from '../shared/property';
+import {findRoute,type Point} from '../shared/navigation';
+import {worldFree} from './spatial';
+import {enterpriseOf,enterpriseData,random,type BusinessKind} from './enterprise';
+import {trafficClock} from './trafficState';
+import {vehicleSize} from '../shared/city';
+import type {Save,Character} from './game';
+export type Citizen={id:string;name:string;role:'worker'|'shopper'|'student'|'thief'|'tenant';district:string;home:Point;position:Point;target:Point;activity:string;route:Point[];nextPlan:number;lastVisit:string;ride?:{vehicle:number;destination:string;from:string};character:Partial<Character>;lastCommutePeriod?:string;boardAfter?:number;blocked:number;walked:boolean};
+export const citizens=new Map<string,Citizen>();
+export const npcTraffic={stops:new Map<number,{time:number;cooldown:number;passengers:string[]}>()};
+const names=['Bisi','Chinedu','Aisha','Kunle','Ngozi','Musa','Seyi','Favour','Emeka','Hauwa','Tobi','Zainab','Ife','Ada','Yusuf','Kemi'];
+export function createCitizens(g:Save):Citizen[]{return Array.from({length:32},(_,i)=>{const d=districts[i%districts.length],r=random(g.seed,i),home=parcels.find(p=>p.id===`house-${d.id}`)!,point=entrance(home),id='citizen-'+i;return {id,name:names[Math.floor(r*names.length)],role:(['worker','shopper','student','tenant','thief'] as const)[Math.floor(random(g.seed+2,i)*5)],district:d.id,home:point,position:[d.x+(i%2?4.9:-4.9),d.z+9-i%4*1.3] as Point,target:point,activity:'idle',route:[],nextPlan:0,lastVisit:'',character:{model:'character-'+String.fromCharCode(97+Math.floor(random(g.seed+3,i)*8)),gender:r>.5?'female':'male',shirt:['#bb865a','#6d8a9d','#9f799e','#78854c','#c4a960'][i%5],skin:['#593c2c','#875936','#b8825b'][Math.floor(random(g.seed+4,i)*3)],hair:['#242822','#443522','#302723'][i%3],hairstyle:(['short','afro','braids'] as const)[i%3]},blocked:0,walked:false} satisfies Citizen;});}
+export function businessDestination(g:Save,c:Citizen){const e=enterpriseOf(g),hour=g.minutes/60;return Object.entries(e.businesses).filter(([id,b])=>{const p=parcels.find(a=>a.id===id),hours=enterpriseData.businesses[b.kind].hours;return p&&b.open&&Object.values(b.stock).some(n=>n>0)&&(hours[0]<hours[1]?hour>=hours[0]&&hour<hours[1]:hour>=hours[0]||hour<hours[1]);}).sort(([a,x],[b,y])=>{const pa=parcels.find(p=>p.id===a)!,pb=parcels.find(p=>p.id===b)!;return Math.hypot(pa.x-c.position[0],pa.z-c.position[1])-Math.hypot(pb.x-c.position[0],pb.z-c.position[1])-(x.ads-y.ads)*3-(x.reputation-y.reputation)*.05;})[0]?.[0];}
+export function planCitizen(c:Citizen,g:Save,time:number){const hour=g.minutes/60,e=enterpriseOf(g),d=districts.find(d=>d.id===c.district)!,i=Number(c.id.split('-')[1]),business=businessDestination(g,c);let point:Point=c.home,activity='sleeping';
+ const employment=Object.entries(e.plots).flatMap(([id,p])=>Object.entries(p.staff).flatMap(([role,count])=>Array.from({length:count??0},()=>({id,role}))))[i];
+ const tenant=Object.keys(g.sim?.tenants??{})[i];if(tenant){const p=parcels.find(p=>p.id===tenant);if(p)c.home=entrance(p);}
+ if(hour>=6&&hour<9&&c.lastCommutePeriod!==`${g.day}-morning`){const terminal=locations.find(l=>l.id==='terminal-'+d.id)!;point=[terminal.x+(i%3-1)*.9,terminal.z+(Math.floor(i/3)%3)*.85];activity='commuting';}
+ else if(hour>=17&&hour<19&&c.role==='worker'&&c.lastCommutePeriod!==`${g.day}-evening`){const terminal=locations.find(l=>l.id==='terminal-'+d.id)!;point=[terminal.x+(i%3-1)*.9,terminal.z];activity='commuting';}
+ else if((hour>=9||c.lastCommutePeriod===`${g.day}-morning`)&&hour<17&&c.role==='worker'){const workplace=locations.find(l=>l.district===d.id&&l.type==='work');point=workplace?[workplace.x,workplace.z+1]:[d.x+4.9,d.z-8];activity='working';}
+ else if(hour>=6&&hour<9&&c.lastCommutePeriod===`${g.day}-morning`){point=[d.x+4.9,d.z+5];activity='arrived at destination';}
+ else if(hour>=9&&hour<16&&c.role==='student'){point=[24,12+(i%3)*.85];activity='studying';}
+ else if(hour>=9&&hour<22&&business){const p=parcels.find(p=>p.id===business)!;point=entrance(p);point=[point[0]+(i%3-1)*.9,point[1]+Math.floor(i/3)%3*.85];activity='shopping:'+business;}
+ else if(hour>=17&&hour<21){point=[d.x+(i%2?4.9:-4.9),d.z+2+(i%4)*1.1];activity=c.role==='thief'?'looking for a victim':'socializing';}
+ else if(hour>=9&&hour<17){const l=locations.find(l=>l.district===d.id&&l.type==='shop');point=l?[l.x+(i%3-1)*.8,l.z+1]:[d.x-4.9,d.z+8];activity='shopping';}
+ if(employment&&hour>=9&&hour<17){const p=parcels.find(p=>p.id===employment.id);if(p){point=entrance(p);point=[point[0]+(i%3-1)*.9,point[1]+1];activity='working as '+employment.role;}}
+ c.activity=activity;c.target=point;c.nextPlan=time+8+random(g.seed+i,g.day)*10;
+ const free=worldFree(g),route=findRoute(c.position,point,free,5000);c.route=route??[];if(!route&&free(...point))c.nextPlan=time+4;
+ return c;
+}
+export const citizenGreeting=(g:Save,c:Citizen)=>({en:`Hello, I'm ${c.name}. I'm ${c.activity.split(':')[0]}.`,pcm:`How far! Na ${c.name}. I dey ${c.activity.split(':')[0]}.`,yo:`Ẹ káàbọ̀. Orúkọ mi ni ${c.name}.`,ig:`Ndewo. Aha m bụ ${c.name}.`,ha:`Sannu. Sunana ${c.name}.`})[enterpriseOf(g).locale];
+export function boardCitizen(c:Citizen,vehicle:number,kind:VehicleKind,g:Save){const stop=npcTraffic.stops.get(vehicle);if((c.boardAfter??0)>trafficClock.time||!stop||stop.time<=0||stop.passengers.includes(c.id)||stop.passengers.length>=(({bus:6,car:2,bike:1,keke:3,bicycle:1,suv:3,sports:1,luxury:3,taxi:2,van:2})[kind]))return false;const from=districtAt(...c.position),destination=districts.find(d=>d.x===from.x&&d.id!==from.id)!;if(!destination)return false;stop.passengers.push(c.id);c.ride={vehicle,destination:destination.id,from:from.id};c.activity='riding '+vehicles[kind].name;c.route=[];return true;}
+export function unboardCitizen(c:Citizen,point:Point,g:Save){if(!c.ride)return false;const free=worldFree(g),spots=Array.from({length:24},(_,i)=>[point[0]+(i%2?1:-1)*(2.2+Math.floor(i/8)*.8),point[1]+(i%4-1.5)*.9] as Point),spot=spots.find(p=>free(...p)&&trafficClock.cars.every(t=>g.enterprise?.stolen.includes('traffic-'+t.id)||Math.abs(p[0]-t.x)>vehicleSize(t.kind)[0]+.45||Math.abs(p[1]-t.z)>vehicleSize(t.kind)[1]+.45)&&[...citizens.values()].every(a=>a.id===c.id||a.ride||Math.hypot(a.position[0]-p[0],a.position[1]-p[1])>.8));if(!spot)return false;const stop=npcTraffic.stops.get(c.ride.vehicle);if(stop)stop.passengers=stop.passengers.filter(id=>id!==c.id);c.position=spot;c.district=districtAt(...spot).id;c.ride=undefined;c.lastCommutePeriod=`${g.day}-${g.minutes<720?'morning':'evening'}`;c.boardAfter=trafficClock.time+15;c.activity='arrived';c.nextPlan=0;return true;}

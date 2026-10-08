@@ -1,0 +1,45 @@
+{
+  "crops": {
+    "maize":{"name":"Maize","germination":7,"days":100,"seed":300,"price":900,"yield":8,"season":"rainy","pest":"armyworm"},
+    "cassava":{"name":"Cassava","germination":14,"days":300,"seed":450,"price":1200,"yield":10,"season":"rainy","pest":"cassava mosaic","processed":"garri"},
+    "yam":{"name":"Yam","germination":21,"days":240,"seed":500,"price":1500,"yield":6,"season":"rainy","pest":"beetles"},
+    "tomato":{"name":"Tomatoes","germination":7,"days":90,"seed":250,"price":650,"yield":12,"season":"dry","pest":"aphids","spoil":3},
+    "rice":{"name":"Rice","germination":7,"days":120,"seed":350,"price":1100,"yield":9,"season":"rainy","pest":"armyworm"},
+    "beans":{"name":"Cowpea","germination":5,"days":80,"seed":250,"price":1000,"yield":8,"season":"rainy","pest":"aphids"},
+    "palm":{"name":"Oil palm","germination":60,"days":900,"seed":1000,"price":2200,"yield":12,"season":"rainy","pest":"weevils","processed":"red-oil"},
+    "cocoa":{"name":"Cocoa","germination":14,"days":1095,"seed":1200,"price":3000,"yield":8,"season":"rainy","pest":"capsids","processed":"cocoa-beans"}
+  },
+  "blocks": {
+    "wall":{"name":"Block wall","cost":500,"w":1,"d":1,"h":2.5,"solid":true,"color":"#baac92"},
+    "floor":{"name":"Floor tile","cost":200,"w":1,"d":1,"h":0.08,"solid":false,"color":"#a78b69"},
+    "fence":{"name":"Fence","cost":250,"w":1,"d":0.15,"h":1.3,"solid":true,"color":"#8f7957"},
+    "gate":{"name":"Open gate","cost":600,"w":1,"d":0.15,"h":1.7,"solid":false,"color":"#475b48"},
+    "borehole":{"name":"Borehole / irrigation","cost":6500,"w":1,"d":1,"h":2,"solid":true,"color":"#6c9dad"},
+    "generator":{"name":"Generator","cost":4500,"w":1,"d":1,"h":0.8,"solid":true,"color":"#677344"},
+    "warehouse":{"name":"Warehouse","cost":9000,"w":3,"d":3,"h":3.2,"solid":true,"color":"#959d87"},
+    "shop":{"name":"Shop / showroom","cost":7000,"w":3,"d":3,"h":2.6,"solid":true,"color":"#8caa91"},
+    "poultry":{"name":"Poultry house","cost":5000,"w":3,"d":2,"h":1.8,"solid":true,"color":"#bdaf73"},
+    "cowshed":{"name":"Cowshed","cost":8000,"w":3,"d":3,"h":2.8,"solid":true,"color":"#aa8d65"},
+    "bed":{"name":"Crop bed","cost":400,"w":2,"d":2,"h":0.15,"solid":false,"color":"#775e3f"},
+    "greenhouse":{"name":"Greenhouse","cost":12000,"w":3,"d":3,"h":2.8,"solid":true,"color":"#92bba9"},
+    "security":{"name":"Security post","cost":3000,"w":1,"d":1,"h":2,"solid":true,"color":"#49554c"},
+    "cctv":{"name":"CCTV pole","cost":2500,"w":0.4,"d":0.4,"h":3,"solid":true,"color":"#566265"},
+    "cold-store":{"name":"Cold storage","cost":8500,"w":2,"d":2,"h":2,"solid":true,"color":"#bec8c3"},
+    "shelves":{"name":"Shop shelves","cost":1200,"w":1,"d":1,"h":1.5,"solid":true,"color":"#b29c75"},
+    "lamp":{"name":"Solar lamp","cost":750,"w":0.4,"d":0.4,"h":2.5,"solid":true,"color":"#d6bd79"},
+    "safe":{"name":"Hidden safe","cost":2000,"w":1,"d":1,"h":0.6,"solid":true,"color":"#455951"}
+  },
+  "businesses": {
+    "provisions":{"name":"Provision shop","goods":{"water":{"cost":100,"price":300},"food":{"cost":450,"price":1200},"medicine":{"cost":700,"price":1800}},"hours":[7,22]},
+    "phone":{"name":"Phone & repair shop","goods":{"phone":{"cost":8000,"price":12000},"accessories":{"cost":400,"price":900},"screen-repair":{"cost":600,"price":2000}},"hours":[9,19]},
+    "dealership":{"name":"Tokunbo dealership","goods":{"used-car":{"cost":13000,"price":20000},"bike":{"cost":6000,"price":9500},"parts":{"cost":700,"price":1400}},"hours":[9,18]},
+    "club":{"name":"Nightclub","goods":{"entry":{"cost":100,"price":1500},"drink":{"cost":200,"price":800}},"hours":[19,4]},
+    "church":{"name":"Community worship centre","goods":{"event":{"cost":150,"price":400}},"hours":[7,13]},
+    "farm":{"name":"Farm market","goods":{"produce":{"cost":200,"price":700}},"hours":[6,18]},
+    "transport":{"name":"Transport company","goods":{"fare":{"cost":100,"price":400}},"hours":[5,23]}
+  },
+  "birds":{"broiler":{"name":"Broilers","days":49,"price":3000},"layer":{"name":"Layers","days":147,"price":3500},"cockerel":{"name":"Cockerels","days":112,"price":4000},"turkey":{"name":"Turkeys","days":140,"price":10000}},
+  "cattle":["White Fulani","Sokoto Gudali","Red Bororo"],
+  "staff":{"cashier":400,"farmhand":500,"security":600,"driver":700,"manager":900,"herder":600,"mechanic":650},
+  "housing":["Shared room","Single room","Self-contained","Mini flat","One bedroom","Two bedrooms","Three bedrooms","Duplex","Villa","Mansion","Penthouse","Estate"]
+}

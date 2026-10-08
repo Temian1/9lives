@@ -14,7 +14,7 @@ Open the URL Vite prints. Phones on the same Wi-Fi can use the LAN URL. `npm run
 ## Playable now
 
 - Six connected fictionalized districts: Yaba, Ikorodu, Ikeja, Victoria Island, Mainland, and Lekki. Walk between them or use roads and motor parks. Detailed nearby districts load as you explore.
-- Car, danfo bus, okada, and keke trips: board at a motor park, pay once, watch from a modeled rear passenger cabin in cars/buses (switch to an exterior camera), and arrive at the destination park. Saved trips resume without a second fare.
+- Ten vehicle categories: car, danfo bus, okada, keke, bicycle, SUV, sports car, luxury sedan, taxi and delivery van. Trips: board at a motor park, pay once, watch from a modeled rear passenger cabin in cars/buses (switch to an exterior camera), and arrive at the destination park. Saved trips resume without a second fare.
 - Buy vehicle keys at Mainland Motors; tap a key in your backpack to drive using WASD / joystick and Shift. Exit from the driving banner.
 - Moving traffic can kill a pedestrian and damage a driven vehicle. Respawn at your home/hospital checkpoint, lose one life and medical expenses, and keep skills and purchases. The ninth death starts a persistent one-hour break before a fresh campaign can begin.
 - Male/female guest characters: name, skin tone, clothing, hair color, and short/afro/braided hairstyles. Optional email is saved with the local profile. No account is needed to play.
@@ -25,7 +25,7 @@ Open the URL Vite prints. Phones on the same Wi-Fi can use the LAN URL. `npm run
 - Furnished cutaway home interiors: walk around, tap furniture or use Sit, Sleep and Watch TV. Buy a sofa, bed, TV, kitchen, table and plant; purchases and interior state persist locally.
 - Rotating/pinching touch camera, mouse right-drag and wheel zoom, transparent mobile stats collapsed by default.
 - Hawkers sell supplies, motor parks have boarding rings, Mainland Motors displays vehicles, and roadside billboards advertise the districts. The Music button plays licensed recordings after a user gesture. Life & jobs → Music & club playlist lets you choose tracks or import your permitted MP3/OGG/WAV files.
-- Police/EFCC patrols pursue wanted players. Capture deducts the fine, advances two hours and returns you to the police station. Selling the evidence creates a wanted level.
+- Police/EFCC patrols pursue wanted players. Capture opens jail, bail and a free legal hearing; it does not consume a life. Selling the evidence creates a wanted level.
 - Animated loading screen and responsive character preview.
 
 ## Five-chapter story
@@ -36,7 +36,7 @@ Open the URL Vite prints. Phones on the same Wi-Fi can use the LAN URL. `npm run
 4. **Survival Costs Money**: take the ledger to Ikeja. Report it to the EFCC or sell it for more cash and a wanted level.
 5. **Nine Chances**: visit Island Logistics in Victoria Island. Your earlier choice determines the final contract and ending.
 
-Payments are gated by stage. Five survival stats share one simulation engine. Rotated vehicle footprints, swept movement and shared building/stall bounds prevent clipping. Equal lane speeds and separation checks keep traffic from overtaking through cars; traffic yields to the player vehicle. Low graphics disables shadows and caps resolution. Animated GLB characters and daytime sidewalk pedestrians are included. Full individual NPC schedules and physical Android performance profiling remain future work.
+Payments are gated by stage. Five survival stats share one simulation engine. Rotated vehicle footprints, swept movement and shared building/stall bounds prevent clipping. Equal lane speeds and separation checks keep traffic from overtaking through cars; traffic yields to the player vehicle. Low graphics disables shadows and caps resolution. Animated GLB characters and 32 varied citizens follow nearby work, shopping, school, social, sleep and commute routines. Physical Android performance profiling remains unverified.
 
 ## Controls and saves
 
@@ -50,9 +50,17 @@ New campaigns start with ₦1,000,000. Older saves receive a one-time starter-fu
 
 Available homes can be rented with the first week's rent and two weeks' deposit. Weekly arrears generate notices and landlord messages; negotiate once per day, pay arrears or end your lease. Three unpaid cycles cause eviction. Owned houses can be let to tenants for weekly income. Sell any owned property for 70% of catalog value including furniture/improvements; sale removes access and business records.
 
-Enter any owned building or rented home at its entrance. Homes support cooking, bathing, cleaning, exercise and storage alongside sitting/sleeping/TV. Clubs, churches and shops have themed fixtures and can be furnished. Position furniture and construct/move/rotate room dividers in the editor. Business stock/staff produce daily income minus wages. This economy is abstract; customers do not yet trade individually simulated items.
+Enter any owned building or rented home at its entrance. Homes support cooking, bathing, cleaning, exercise and storage alongside sitting/sleeping/TV. Clubs, churches and shops have themed fixtures and can be furnished. Position furniture and construct/move/rotate room dividers in the editor. Businesses now use product stock/prices and actual NPC visits: each customer spends a budget and consumes stock once. Hours, rival price thresholds, advertising, reputation, power and weekly wages affect operation. Existing businesses migrate to this model.
 
-Hospitals sell one **in-game life** for ₦25,000, maximum nine. No real-money purchase occurs and zero lives cannot bypass the one-hour break. Fuel, condition and parking coordinates persist for owned vehicles; find them in Vehicle care. Vehicles accelerate and decelerate, with Space braking on keyboard and joystick-release deceleration on touch. Day/night lighting follows the player; every third game day brings rain.
+Hospitals sell one **in-game life** for ₦25,000, maximum nine. No real-money purchase occurs and zero lives cannot bypass the one-hour break. Fuel, condition and parking coordinates persist for owned vehicles; find them in Vehicle care. Vehicles accelerate and decelerate, with Space braking on keyboard and joystick-release deceleration on touch. Day/night lighting follows the player; seeded Lagos-calendar seasons bring rain/storms/floods, dry-season drought/harmattan, blackouts and fuel scarcity.
+
+## Living Lagos expansion
+
+Open **Life & jobs → Land, farming & businesses**, or use the construction/business button on an owned property. There are 76 parcels, twelve named housing tiers, deed registration, a saved grid builder with undo/refunds, crop farming, poultry/cattle, staff wages, generator fuel, insurance, fleet income, careers, education and multi-step side missions. Owned home vaults store money/items; resale returns these belongings and removes the sold business.
+
+Approach and tap a parked or moving vehicle to attempt robbery/theft. Interactions pause traffic, exits get a brief grace period, and alarms can start the three-lane escape minigame. Police, jail/hearings and fictional EFCC audit stages provide consequences. Fists and pistol shots can incapacitate NPCs outside protected zones; injured NPCs recover the next game day.
+
+The Phone button opens apps for weather, contacts, jobs, banking, business and landlord notices. Real-player chat clearly stays Coming soon. Read [REQUIREMENTS_AUDIT.md](REQUIREMENTS_AUDIT.md) for the complete comparison against every pasted brief, including partial implementations and outstanding requests.
 
 ## Multiplayer — Coming soon
 
@@ -74,4 +82,4 @@ Add licensed GLBs to public/assets/models/ and use Asset or RiggedPerson to expa
 
 The production service worker caches the shell and successfully visited code/models. Visit the game and districts online first; unvisited assets are not predownloaded. Recorded music is excluded from offline caching. Imported songs remain on their original device. The manifest permits either orientation; development does not register the service worker.
 
-This is a playable prototype. Full career trees, individual NPC home/work calendars, persistent shared construction, advanced suspension, terrain streaming, detailed crime evidence/witness simulation, melee/cover combat, visitor AI and physical Android long-session profiling remain future work. Repair/shop jobs are ordered task menus rather than physics simulations. Delivery/taxi jobs use pickup/destination checks. Automated tests cover campaign/survival/collisions/purchases/room rules plus landlord eviction, resale, banking, jobs and malformed nested saves. Browser checks cover desktop/mobile layouts, property purchase/entry, saved deeds, character previews, asset loading, touch controls and tap-to-move.
+This is a playable prototype. Advanced suspension, turning traffic intersections, walkable multiple floors, authored housing layouts, terrain streaming, forensic crime evidence, hostile NPC gunfire/cover, full career/education minigames and shared construction remain future work. The requirements audit describes precise limits; passing automated tests does not establish glitch-free long sessions or physical Android performance. Repair/shop jobs are ordered task menus rather than physics simulations. Delivery/taxi jobs use pickup/destination checks. Automated tests cover campaign/survival/collisions/purchases/room rules plus landlord eviction, resale, banking, jobs and malformed nested saves. Browser checks cover desktop/mobile layouts, property purchase/entry, saved deeds, character previews, asset loading, touch controls and tap-to-move.

@@ -1,0 +1,15 @@
+import items from '../shared/item-data.json';
+import {defaultCharacter,type Save} from './game';
+import {enterpriseOf} from './enterprise';
+import {validRoomLayout} from './spatial';
+import type {Furniture} from '../shared/property';
+export {items};
+export function catalogAction(g:Save,id:string,use=false){const item=items.find(a=>a.id===id||a.name===id);if(!item)return {game:g,message:'Unknown catalogue item.'};if(!g.lives)return {game:g,message:'Your campaign is on a break.'};if(!use){if(g.money<item.price)return {game:g,message:'Not enough cash.'};if(item.durability>1&&g.inventory.includes(item.name))return {game:g,message:'You already own this item.'};return {game:{...g,money:g.money-item.price,inventory:[...g.inventory,item.name]},message:`${item.name} bought. Tap it in your backpack to use.`};}
+ if(!g.inventory.includes(item.name))return {game:g,message:'This item is not in your backpack.'};let next={...g,stats:{...g.stats},character:{...(g.character??defaultCharacter)}};const cap=(n:number)=>Math.max(0,Math.min(100,n)),value=Number(item.value),owned=g.properties?.find(p=>p.id===g.interior);
+ if(['furniture','paint','floor','door','window'].includes(item.effect)&&!owned)return {game:g,message:'Enter an owned home before installing this item.'};
+ if(item.effect==='food')next.stats.hunger=cap(g.stats.hunger+value);if(item.effect==='drink')next.stats.hydration=cap(g.stats.hydration+value);if(['shirt','pants','shoes'].includes(item.effect))next.character={...next.character,[item.effect]:item.value};if(item.effect==='cap')next.character.accessory='cap';if(item.effect==='entertainment')next.stats.stress=cap(g.stats.stress-value);if(item.effect==='fitness')next.skills={...g.skills,fitness:g.skills.fitness+1};if(item.effect==='haircut')next.character.hairstyle='short';
+ if(item.effect==='furniture'&&owned?.furniture.includes(item.value as Furniture))return {game:g,message:'This furniture is already installed.'};if(item.effect==='furniture'&&owned&&!validRoomLayout({...owned,furniture:[...owned.furniture,item.value as Furniture]}))return {game:g,message:'Make room without blocking the doorway before installing this furniture.'};if(item.effect==='furniture')next.properties=g.properties?.map(p=>p.id===g.interior?{...p,furniture:[...new Set([...p.furniture,item.value as Furniture])]}:p);
+ if(['paint','floor','door','window'].includes(item.effect))next.properties=g.properties?.map(p=>p.id===g.interior?{...p,decor:{...p.decor,[item.effect]:item.value as string}}:p);
+ if(['pesticide','fertilizer','reputation'].includes(item.effect)){const e=structuredClone(enterpriseOf(g));if(item.effect==='reputation')for(const b of Object.values(e.businesses))b.reputation=cap(b.reputation+value);else for(const p of Object.values(e.plots)){if(item.effect==='fertilizer')p.soil=cap(p.soil+value);for(const c of p.crops)if(item.effect==='pesticide')c.health=cap(c.health+value);else c.soil=cap(c.soil+value);}next.enterprise=e;}
+ if(item.durability===1||item.effect==='furniture'){const index=next.inventory.indexOf(item.name);next.inventory=next.inventory.filter((_,i)=>i!==index);}return {game:next,message:`${item.name} used.`};
+}

@@ -1,5 +1,6 @@
-export type VehicleKind = 'car' | 'bus' | 'bike' | 'keke';
+export type VehicleKind = 'car' | 'bus' | 'bike' | 'keke' | 'bicycle' | 'suv' | 'sports' | 'luxury' | 'taxi' | 'van';
 export const vehicles: Record<VehicleKind, { name: string; fare: number; price: number; speed: number; duration: number; key: string }> = {
+  bicycle:{name:'Bicycle',fare:150,price:3500,speed:6,duration:35,key:'Bicycle key'},suv:{name:'SUV',fare:1800,price:45000,speed:12,duration:17,key:'SUV key'},sports:{name:'Sports car',fare:2500,price:70000,speed:20,duration:12,key:'Sports car key'},luxury:{name:'Luxury sedan',fare:3000,price:90000,speed:15,duration:14,key:'Luxury car key'},taxi:{name:'Taxi',fare:1100,price:20000,speed:12,duration:18,key:'Taxi key'},van:{name:'Delivery van',fare:800,price:30000,speed:10,duration:22,key:'Van key'},
   car: { name: 'Car', fare: 1200, price: 18000, speed: 13, duration: 16, key: 'Car key' },
   bus: { name: 'Danfo bus', fare: 400, price: 35000, speed: 9, duration: 24, key: 'Bus key' },
   bike: { name: 'Okada bike', fare: 250, price: 9000, speed: 15, duration: 13, key: 'Bike key' },
@@ -18,6 +19,7 @@ export const districtAt = (x: number, z: number) => [...districts].sort((a, b) =
 export type Place = { id: string; name: string; label: string; x: number; z: number; color: string; district: DistrictId; type: string };
 const place = (id: string, name: string, type: string, district: DistrictId, x: number, z: number, label = ''): Place => { const d=districts.find(d=>d.id===district)!;return {id,name,type,district,x:d.x+x,z:d.z+z,label,color:d.color}; };
 export const locations: Place[] = [
+  place('lands','Lands Bureau','enterprise','yaba',-15,18,'Register your deed'),place('yabaleft','Yaba Left clinic','hospital','yaba',-21,-8,'Wellbeing & care'),place('ade','Ade · mechanic mentor','enterprise','yaba',6.3,-7,'Three-step mission'),place('agrovet','Agrovet & land agent','enterprise','ikorodu',16,12,'Farming & staff'),place('school','Technical college','enterprise','yaba',24,12,'Careers & education'),
   place('tunde','Tunde','tunde','yaba',3.8,2.2,'Your old friend'),place('shop','Amara’s shop','shop','yaba',-5.7,4.3,'Food & supplies'),place('home','Your apartment','home','yaba',-6,-3,'Safe checkpoint'),place('work','Femi’s workshop','work','yaba',6.3,-4,'Earn ₦3,000'),place('delivery','The meeting point','delivery','yaba',0,-11.5,'Midnight delivery'),
   ...districts.map(d=>place(`terminal-${d.id}`,`${d.name} motor park`,'terminal',d.id,-4,12,'Board a vehicle')),
   place('ikorodu-market','Ikorodu market','shop','ikorodu',-5.8,4,'Trade & supplies'),place('hospital','General Hospital','hospital','ikorodu',6.1,-4,'Treatment & emergency work'),place('amara-contact','Nurse Sade','story','ikorodu',3.8,2.2,'The price of trust'),place('river','Riverfront depot','story','ikorodu',0,-12,'Find the missing ledger'),
@@ -31,22 +33,24 @@ export const blockers = districts.flatMap((d, di)=>[
   ...blocks.map((b,i)=>({...b,x:b.x+d.x,z:b.z+d.z,district:d.id,h:(di===3?12+i*3:di===1?3:di===5?4:6)+i%2,label:['RESIDENCES','MARKET','BUSINESS','HOMES','TRADERS','COMMUNITY'][i],style:di})),
   ...Array.from({length:[12,18,10,8,14,6][di]},(_,i)=>({x:d.x+(i%2?-1:1)*(17+(Math.floor(i/2)%3)*7),z:d.z-32-Math.floor(i/6)*9,w:di===5?6:4,d:di===4?7:5,district:d.id,h:di===3?14+i*2:di===1?2.6:di===5?4.5:3+i%3,label:['BAKERY','SALON','PHARMACY','TAILOR','CAFE','HOMES'][i%6],style:di})),
 ]);
+blockers.push(...[{x:25,z:8,w:8,d:7,district:'yaba' as const,h:25,label:'YABA TECH TOWER',style:3},{x:-27,z:-8,w:10,d:8,district:'yaba' as const,h:5,label:'YABA LEFT CLINIC',style:2},{x:-15,z:22,w:6,d:5,district:'yaba' as const,h:4,label:'LANDS BUREAU',style:2}]);
+export const riverClear=(x:number,z:number)=>Math.abs(z+60)>5||[-100,0,100].some(road=>Math.abs(x-road)<5.5);
+export const publicVehicles=districts.flatMap(d=>[{id:'park-'+d.id+'-bus',kind:'bus' as VehicleKind,x:d.x-8,z:d.z+20},{id:'park-'+d.id+'-car',kind:'car' as VehicleKind,x:d.x+8,z:d.z+20},...(['car','bike','keke'] as VehicleKind[]).map((kind,i)=>({id:`public-${d.id}-${kind}`,kind,x:d.x+14+i*3,z:d.z+18}))]);
 export const streetObstacles = districts.flatMap(d=>[
-  {x:d.x-8,z:d.z+20,w:2,d:4.1},{x:d.x+8,z:d.z+20,w:1.9,d:3.6},
   ...Array.from({length:d.id==='ikorodu'?10:d.id==='ikeja'?6:3},(_,i)=>({x:d.x-17-(i%3)*3,z:d.z+2-Math.floor(i/3)*3,w:2.2,d:1.8})),
 ]);
-export const canMove = (x:number,z:number) => Number.isFinite(x)&&Number.isFinite(z)&&x > -145&&x < 145&&z > -155&&z < 28&&![...blockers,...streetObstacles].some(b=>Math.abs(x-b.x)<b.w/2+.35&&Math.abs(z-b.z)<b.d/2+.35);
+export const canMove = (x:number,z:number) => Number.isFinite(x)&&Number.isFinite(z)&&x > -145&&x < 145&&z > -155&&z < 28&&riverClear(x,z)&&![...blockers,...streetObstacles].some(b=>Math.abs(x-b.x)<b.w/2+.35&&Math.abs(z-b.z)<b.d/2+.35);
 export function trafficAt(time:number) { return Array.from({length:18},(_,i)=>{const lane=i%6,roadX=[-100,0,100][Math.floor(lane/2)],direction=lane%2?1:-1,speed=6;return {id:i,kind:(['car','bus','bike','keke'] as VehicleKind[])[i%4],x:roadX+(direction>0?-2.3:2.3),z:-123+(((time*speed+Math.floor(i/6)*49)%147)+147)%147,angle:direction>0?0:Math.PI,speed,direction};}).map(t=>({...t,z:t.direction>0?t.z:-99-t.z})); }
 
-export const vehicleSize = (kind: VehicleKind): [number,number] => kind==='bus'?[1,2.05]:kind==='car'?[.95,1.8]:kind==='keke'?[.85,1.3]:[.5,1.3];
+export const vehicleSize = (kind: VehicleKind): [number,number] => kind==='bus'?[1,2.05]:kind==='car'?[.95,1.8]:kind==='keke'?[.85,1.3]:kind==='van'?[1.1,2.4]:kind==='suv'?[1.05,2.1]:['sports','luxury','taxi'].includes(kind)?[.95,1.8]:[.5,1.3];
 export type Obstacle = {x:number;z:number;w:number;d:number};
 export function overlapsVehicle(x:number,z:number,angle:number,kind:VehicleKind,b:Obstacle) {
   const [w,d]=vehicleSize(kind),c=Math.cos(angle),s=Math.sin(angle),dx=b.x-x,dz=b.z-z;
   return Math.abs(dx)<Math.abs(c)*w+Math.abs(s)*d+b.w/2+.08 && Math.abs(dz)<Math.abs(s)*w+Math.abs(c)*d+b.d/2+.08 && Math.abs(dx*c-dz*s)<w+Math.abs(c)*b.w/2+Math.abs(s)*b.d/2+.08 && Math.abs(dx*s+dz*c)<d+Math.abs(s)*b.w/2+Math.abs(c)*b.d/2+.08;
 }
-export function canDrive(x:number,z:number,angle:number,kind:VehicleKind,extra:Obstacle[]=[]) {
+export function canDrive(x:number,z:number,angle:number,kind:VehicleKind,extra:Obstacle[]=publicVehicles.map(v=>({x:v.x,z:v.z,w:v.kind==='bus'?2:1.9,d:v.kind==='bus'?4.1:3.6}))) {
   const [w,d]=vehicleSize(kind),r=Math.hypot(w,d);
-  return Number.isFinite(angle)&&x-r>-145&&x+r<145&&z-r>-155&&z+r<28&&![...blockers,...streetObstacles,...extra].some(b=>overlapsVehicle(x,z,angle,kind,b));
+  return riverClear(x,z)&&Number.isFinite(angle)&&x-r>-145&&x+r<145&&z-r>-155&&z+r<28&&![...blockers,...streetObstacles,...extra].some(b=>overlapsVehicle(x,z,angle,kind,b));
 }
 export function sweptDrive(from:[number,number],to:[number,number],angle:number,kind:VehicleKind,extra:Obstacle[]=[]) {
   const steps=Math.max(1,Math.ceil(Math.hypot(to[0]-from[0],to[1]-from[1])/.2));

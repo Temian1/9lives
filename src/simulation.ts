@@ -1,3 +1,4 @@
+import {enterpriseData,enterpriseDay,enterpriseOf} from './enterprise';
 import { districts, districtAt, locations, vehicles, type VehicleKind } from '../shared/city';
 import { buildTypes, entrance, furnishings, parcels, starterProperty, type Furniture } from '../shared/property';
 import type { Save } from './game';
@@ -22,7 +23,7 @@ const addMessage=(s:Simulation,text:string)=>({...s,messages:[text,...s.messages
 export const rentPrice=(id:string)=>Math.max(1000,Math.round((parcels.find(p=>p.id===id)?.price??20000)*.05));
 export const salePrice=(g:Save,id:string)=>{
   const p=(g.properties??[starterProperty()]).find(p=>p.id===id),parcel=parcels.find(p=>p.id===id);if(!p||!parcel)return 0;
-  return Math.floor((parcel.price+(parcel.built?0:p.kind==='land'?0:buildTypes[p.kind].price)+(p.level-1)*5000+p.furniture.reduce((n,f)=>n+furnishings[f].price,0)+(p.walls?.length??0)*500)*.7);
+  return Math.floor((parcel.price+(parcel.built?0:p.kind==='land'?0:buildTypes[p.kind].price)+(p.level-1)*5000+p.furniture.reduce((n,f)=>n+furnishings[f].price,0)+(p.walls?.length??0)*500+(g.enterprise?.plots[id]?.blocks??[]).reduce((n,b)=>n+enterpriseData.blocks[b.kind].cost,0))*.7);
 };
 export function simulationDay(g:Save):Save {
   let s=simOf(g);if(g.day<=s.lastDay)return g;
@@ -31,12 +32,12 @@ export function simulationDay(g:Save):Save {
   for(let day=s.lastDay+1;day<=Math.min(g.day,s.lastDay+31);day++){
     for(const l of [...leases])if(day>l.dueDay){l.arrears+=l.rent;l.dueDay+=7;l.warnings++;s=addMessage(s,`Landlord: ${l.id} rent is overdue. Arrears ₦${l.arrears.toLocaleString()}. ${l.warnings>=2?'Final notice: pay before the next rent cycle.':'Please pay or negotiate.'}`);if(l.warnings>=3){leases=leases.filter(a=>a.id!==l.id);if(interior===l.id)interior=undefined;checkpoint=[-4,12];s=addMessage(s,'Landlord palava: you have been evicted after three unpaid rent cycles.');}}
     for(const [id,t] of Object.entries(tenants))if(day>=t.dueDay){money+=t.rent;tenants[id]={...t,dueDay:day+7};s=addMessage(s,`Tenant paid ₦${t.rent.toLocaleString()} for ${id}.`);}
-    for(const [id,b] of Object.entries(businesses)){if(!b.open)continue;const sold=Math.min(b.stock,4+b.staff*3);const revenue=sold*(650+s.progress.business*50),wages=b.staff*400;money+=revenue-wages;businesses[id]={...b,stock:b.stock-sold,earned:b.earned+revenue-wages};if(!sold)s=addMessage(s,`${id}: stock has run out. Restock to serve customers.`);}
+    for(const [id,b] of Object.entries(businesses)){if(enterpriseOf(g).businesses[id]||!b.open)continue;const sold=Math.min(b.stock,4+b.staff*3);const revenue=sold*(650+s.progress.business*50),wages=b.staff*400;money+=revenue-wages;businesses[id]={...b,stock:b.stock-sold,earned:b.earned+revenue-wages};if(!sold)s=addMessage(s,`${id}: stock has run out. Restock to serve customers.`);}
     s={...s,bills:s.bills+500,hygiene:cap(s.hygiene-12),cleanliness:cap(s.cleanliness-8)};
     if(s.hygiene<20||s.cleanliness<20)s={...s,illness:cap(s.illness+15)};
     if(s.debt&&day>s.loanDue){s={...s,debt:Math.ceil(s.debt*1.02),loanDue:day+7};s=addMessage(s,'Bank: overdue loan interest added.');}
   }
-  return {...g,money:Math.max(0,money),interior,checkpoint,sim:{...s,lastDay:g.day,leases,tenants,businesses}};
+  return enterpriseDay({...g,money:Math.max(0,money),interior,checkpoint,sim:{...s,lastDay:g.day,leases,tenants,businesses}});
 }
 export type SimResult={game:Save;message:string};
 export function simulate(g:Save,action:string,value='',amount=0):SimResult {
@@ -53,7 +54,7 @@ export function simulate(g:Save,action:string,value='',amount=0):SimResult {
   if(action==='sell-property'){
     if(!owned)return done('You do not own this property.');const price=salePrice(g,value);
     next={...next,money:g.money+price,properties:(g.properties??[starterProperty()]).filter(p=>p.id!==value),interior:g.interior===value?undefined:g.interior,checkpoint:g.checkpoint&&parcel&&Math.hypot(g.checkpoint[0]-entrance(parcel)[0],g.checkpoint[1]-entrance(parcel)[1])<6?[-4,12]:g.checkpoint};
-    const tenants={...s.tenants},businesses={...s.businesses};delete tenants[value];delete businesses[value];write({tenants,businesses});return done(`Property sold for ₦${price.toLocaleString()}. Furniture and improvements included.`);
+    const e=structuredClone(enterpriseOf(next)),vault=e.vaults[value];if(vault){next.money+=vault.money;next.inventory=[...next.inventory,...vault.items];}delete e.plots[value];delete e.businesses[value];delete e.vaults[value];for(const plot of Object.values(e.plots))plot.merged=plot.merged.filter(id=>id!==value);next={...next,enterprise:e,inventory:next.inventory.filter(item=>item!==`Registered deed: ${value}`&&item!==`Unregistered deed: ${value}`)};const tenants={...s.tenants},businesses={...s.businesses};delete tenants[value];delete businesses[value];write({tenants,businesses});return done(`Property sold for ₦${price.toLocaleString()}. Furniture and improvements included.`);
   }
   if(action==='rent'){
     if(!parcel?.built||owned||s.leases.some(l=>l.id===value))return done('Choose an available house.');const rent=rentPrice(value),deposit=rent*2;if(!spend(rent+deposit))return done('You need the first week of rent and two weeks deposit.');write({leases:[...s.leases,{id:value,rent,dueDay:g.day+7,arrears:0,warnings:0,deposit}]});return done(`Lease signed. ₦${rent.toLocaleString()} weekly. Rent due on day ${g.day+7}.`);
@@ -135,7 +136,7 @@ export function validSimulation(s:unknown):s is Simulation {
   return ['bank','debt','loanDue','bills','lastDay','hygiene','cleanliness','stamina','injury','illness'].every(k=>Number.isFinite(v[k as keyof Simulation])&&Number(v[k as keyof Simulation])>=0)&&Array.isArray(v.leases)&&v.leases.length<=12&&v.leases.every(l=>parcels.some(p=>p.id===l.id)&&[l.rent,l.dueDay,l.arrears,l.warnings,l.deposit].every(n=>Number.isFinite(n)&&n>=0))&&!!v.garage&&Object.entries(v.garage).every(([k,t])=>Object.hasOwn(vehicles,k)&&t&&[t.fuel,t.condition,...t.parked].every(Number.isFinite))&&!!v.progress&&['business','survival','reputation'].every(k=>Number.isFinite(v.progress[k as keyof Simulation['progress']]))&&Array.isArray(v.messages)&&v.messages.every(m=>typeof m==='string')&&Array.isArray(v.completed)&&v.completed.every(m=>typeof m==='string')&&Array.isArray(v.stored)&&v.stored.every(m=>typeof m==='string')&&!!v.businesses&&!!v.tenants&&['follow','protect','stay'].includes(v.guardMode)&&typeof v.editHome==='boolean'&&(!v.job||['delivery','taxi','repair','shop'].includes(v.job.kind)&&Number.isInteger(v.job.stage)&&v.job.stage>=0&&v.job.stage<3&&districts.some(d=>d.id===v.job!.destination));
 }
 export function effectiveProperty(g:Save,id:string) {
-  const owned=(g.properties??[starterProperty()]).find(p=>p.id===id);if(owned)return owned;
+  const owned=(g.properties??[starterProperty()]).find(p=>p.id===id);if(owned){const blocks=g.enterprise?.plots[id]?.blocks??[];return owned.kind==='land'&&blocks.some(b=>b.kind==='shop'||b.kind==='warehouse')?{...owned,kind:'shop' as const}:owned;}
   if(simOf(g).leases.some(l=>l.id===id))return {id,kind:'house' as const,furniture:['bed','sofa','tv','kitchen'] as Furniture[],level:1};
   return undefined;
 }

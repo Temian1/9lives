@@ -1,25 +1,37 @@
 # Controlled expansion plan
 
-The October brief is a staged expansion, not a completed AAA feature list. This release focuses on stability, mobile customization and movement. Multiplayer remains inactive at the player's request.
+The original MVP and later expansion briefs describe multiple stages. Multiplayer remains inactive at the user's request. [REQUIREMENTS_AUDIT.md](REQUIREMENTS_AUDIT.md) records each delivered system, its actual limits and outstanding work.
 
-## Delivered in this update
+## Delivered: stability and mobile controls
 
-- House purchases close their blocking dialog, clear held input, charge once and persist asynchronously. Construction moves a player out of its new footprint when necessary. Older saves trapped in new property geometry recover without resetting the campaign.
-- Character cameras frame the animated model from head to shoes. A visible fallback covers loading and model failures. Appearance controls scroll independently of the preview and Save button in portrait and landscape.
-- Tap-to-walk uses bounded A* search and checked segments around buildings, parked vehicles, current traffic and people. Manual input cancels the route; stalled outdoor routes try replanning. Routes are temporary and do not alter campaign saves.
-- A floating joystick appears on a hold or drag in the lower-left gameplay area and disappears on release, cancel or loss of focus. Separate camera fingers can orbit and pinch. Recenter, camera sensitivity, movement-zone settings and mission direction/distance are available.
-- Pedestrians validate their sidewalk spawn points and steer around bodies with collision checks. The player cannot walk through these pedestrians or stationary shop/story NPCs. Follow-camera obstruction checks shorten the camera path before buildings.
+- Purchases charge once, clear held input and persist locally. Old saves recover from new building geometry without discarding campaign progress.
+- Animated character cameras frame head to shoes, with loading/error fallback. Appearance controls and Save remain usable in portrait and landscape.
+- Tap-to-walk uses bounded A* and checked segments around buildings, parked vehicles, current traffic and people. Manual input cancels a route; stalled routes replan.
+- Contextual floating joystick, independent touch orbit/pinch, recenter, camera sensitivity and mission direction/distance.
 
-## Next world and simulation phases
+## Delivered: Living Lagos simulation foundation
 
-1. Complete NPC navigation and occupancy: persistent home/work schedules, dynamic patrol/guard capsules, navigation regions and group avoidance. Current sidewalk steering is local rather than a full navmesh.
-2. Expand housing tiers and modular room layouts. Add construction previews, grid snapping, undo and doorway/furniture trap validation. Existing furniture placement and divider controls are prototypes.
-3. Expand transport categories, traffic rules, vehicle ownership/theft witnesses and handling. Existing footprint/swept collisions, fuel, repairs and passenger views remain available.
-4. Add the proposed chase minigame, evidence-based pursuit, jail/bail and faction relationships as playable systems.
-5. Deepen careers, businesses, item effects, education, relationships and daily routines. Preserve current rent, resale, landlord notices, jobs, health and bank systems through migrations.
-6. When requested, connect an automatically discovered shared world. Use an authoritative service with atomic, idempotent economy operations and persistent identities; no invitation codes in the final public flow. No shared service is active in this release.
-7. Profile long mobile sessions on physical devices, then budget instancing, asset streaming, animation updates and texture memory. The bundled stylized CC0 models are not photorealistic assets.
+- 76 parcels across five zone categories, twelve named housing tiers, registration/disputes and adjacent deed linking.
+- Persistent grid structures, rotations, preview, undo, demolition refunds and escape-path validation; modular interior entry for built shops/warehouses.
+- Budgeted NPC customer sales, seven business models, product stock/prices, advertising, staff wages/quitting, generator power and insurance. Legacy businesses migrate without duplicate daily revenue.
+- Crops, pests/water/soil/seasons, spoilage/cold storage, processing/quality-based sales, poultry and cattle management.
+- 32 varied nearby citizens with routines, local avoidance, employment/tenancy links, theft events and capacity-checked transport boarding/exits. Patrol and guard routes respect property obstacles.
+- Ten vehicle categories, parked/moving vehicle interactions, theft/robbery risk, saved ownership, fleet fare events and safer parking/exits.
+- Basic solo combat, arcade chase, jail/bail/free hearing and fictional EFCC audit stages. Safe areas remain protected.
+- Multi-step side missions, career shifts/promotions, education credentials, relationship/family milestones, bank interest/investments/ajo and hidden home storage.
+- Calendar-based weather, flood/drought/harmattan effects, rain driving penalty, blackouts, fuel scarcity, inflation and procedural effects audio.
+- Functional catalogue effects and compact phone apps; live-player chat explicitly Coming soon.
+
+## Next production milestones
+
+1. Author distinct housing floorplans with functional doors/stairs and walkable storeys; enlarge/merge construction grids with structural validation.
+2. Add traffic turning/intersections/signals, route dispatch, individual garage vehicles, licenses/rental/refurbishment workflows and authored entry animations.
+3. Extend persistent NPC memory/needs, business service queues, supply logistics, advanced crop/livestock processing and competing shop simulations.
+4. Add physical combat/cover, hostile NPC responses, detailed crime evidence, 3D pursuit and faction systems.
+5. Replace career/course/relationship counters with authored playable interviews, exams, repair/service challenges and household events; expand narrative endings.
+6. Profile representative physical Android devices and long sessions; build asset compression/streaming, richer Nigerian models/materials and performance budgets from measurements.
+7. When requested, deploy an authoritative shared service for automatic multiplayer discovery, real-player chat and atomic shared purchases/trades. No join-code flow is needed in the eventual public experience.
 
 ## Validation
 
-Run `npm test` for campaign, transport, purchases, save validation, landlord/economy rules, navigation, body avoidance, camera obstruction and future backend rules. Run `npm run build` for TypeScript and production bundling. Mobile browser checks cover character framing, dialog overflow, route movement, separate touch inputs and local deed persistence. Physical-device frame-rate and cross-device multiplayer have not been validated.
+58 automated tests pass. TypeScript and production build pass. Browser checks cover portrait/landscape enterprise/phone/profile, character loading, real UI construction payment and IndexedDB restoration, cattle/farm tab isolation, inactive chat and console errors. Physical-device FPS, exhaustive long-session NPC/traffic behavior and cross-device multiplayer are not validated.
