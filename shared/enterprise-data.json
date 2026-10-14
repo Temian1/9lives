@@ -7,7 +7,13 @@
     "rice":{"name":"Rice","germination":7,"days":120,"seed":350,"price":1100,"yield":9,"season":"rainy","pest":"armyworm"},
     "beans":{"name":"Cowpea","germination":5,"days":80,"seed":250,"price":1000,"yield":8,"season":"rainy","pest":"aphids"},
     "palm":{"name":"Oil palm","germination":60,"days":900,"seed":1000,"price":2200,"yield":12,"season":"rainy","pest":"weevils","processed":"red-oil"},
-    "cocoa":{"name":"Cocoa","germination":14,"days":1095,"seed":1200,"price":3000,"yield":8,"season":"rainy","pest":"capsids","processed":"cocoa-beans"}
+    "cocoa":{"name":"Cocoa","germination":14,"days":1095,"seed":1200,"price":3000,"yield":8,"season":"rainy","pest":"capsids","processed":"cocoa-beans"},
+    "plantain":{"name":"Plantain","germination":30,"days":365,"seed":800,"price":1800,"yield":8,"season":"rainy","pest":"banana weevil"},
+    "pepper":{"name":"Scotch bonnet (ata rodo)","germination":10,"days":90,"seed":300,"price":900,"yield":10,"season":"dry","pest":"whiteflies","spoil":4},
+    "okra":{"name":"Okra","germination":6,"days":60,"seed":200,"price":600,"yield":10,"season":"rainy","pest":"flea beetles","spoil":3},
+    "groundnut":{"name":"Groundnut","germination":7,"days":110,"seed":400,"price":1300,"yield":7,"season":"rainy","pest":"rosette virus","processed":"groundnut-oil"},
+    "sorghum":{"name":"Sorghum (guinea corn)","germination":7,"days":120,"seed":250,"price":900,"yield":9,"season":"rainy","pest":"stem borer"},
+    "ginger":{"name":"Kaduna ginger","germination":21,"days":240,"seed":900,"price":2500,"yield":6,"season":"rainy","pest":"rhizome rot","processed":"dried-ginger"}
   },
   "blocks": {
     "wall":{"name":"Block wall","cost":500,"w":1,"d":1,"h":2.5,"solid":true,"color":"#baac92"},
@@ -27,7 +33,12 @@
     "cold-store":{"name":"Cold storage","cost":8500,"w":2,"d":2,"h":2,"solid":true,"color":"#bec8c3"},
     "shelves":{"name":"Shop shelves","cost":1200,"w":1,"d":1,"h":1.5,"solid":true,"color":"#b29c75"},
     "lamp":{"name":"Solar lamp","cost":750,"w":0.4,"d":0.4,"h":2.5,"solid":true,"color":"#d6bd79"},
-    "safe":{"name":"Hidden safe","cost":2000,"w":1,"d":1,"h":0.6,"solid":true,"color":"#455951"}
+    "safe":{"name":"Hidden safe","cost":2000,"w":1,"d":1,"h":0.6,"solid":true,"color":"#455951"},
+    "pen":{"name":"Goat & ram pen","cost":6000,"w":3,"d":2,"h":1.2,"solid":true,"color":"#8a6f4b"},
+    "piggery":{"name":"Piggery","cost":7500,"w":3,"d":2,"h":1.4,"solid":true,"color":"#9c8a76"},
+    "fishpond":{"name":"Concrete fish pond","cost":9000,"w":3,"d":3,"h":0.5,"solid":true,"color":"#3f7f8c"},
+    "snailery":{"name":"Snailery","cost":3500,"w":2,"d":2,"h":0.7,"solid":true,"color":"#6d7a4f"},
+    "hutch":{"name":"Rabbit hutch","cost":2500,"w":2,"d":1,"h":1.1,"solid":true,"color":"#a88a5c"}
   },
   "businesses": {
     "provisions":{"name":"Provision shop","goods":{"water":{"cost":100,"price":300},"food":{"cost":450,"price":1200},"medicine":{"cost":700,"price":1800}},"hours":[7,22]},

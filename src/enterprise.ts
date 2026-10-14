@@ -1,7 +1,8 @@
 import {propertyBounds} from './spatial';
 import data from '../shared/enterprise-data.json';
 import {canMove,canDrive,publicVehicles,districtAt,locations,vehicles,type VehicleKind} from '../shared/city';
-import {entrance,parcels,type Property} from '../shared/property';
+import {entrance,front,parcels,type Property} from '../shared/property';
+import {toFront} from '../shared/roads';
 import {findRoute,type Point} from '../shared/navigation';
 import type {Save} from './game';
 export {data as enterpriseData};
@@ -40,7 +41,7 @@ export function validPlacement(g:Save,id:string,b:Block,existing?:Block[]){const
  const bounds=blockBounds(b),size=('size'in parcel?Number(parcel.size):6)/2;if(Math.abs(b.x)+bounds.w/2>size||Math.abs(b.z)+bounds.d/2>size)return false;
  const blocks=existing??p.blocks;if(blocks.some(a=>a.y===b.y&&Math.abs(a.x-b.x)<(blockBounds(a).w+bounds.w)/2-.05&&Math.abs(a.z-b.z)<(blockBounds(a).d+bounds.d)/2-.05))return false;
  // Keep the deed entrance and a continuous escape corridor open. Floors do not obstruct.
- if(data.blocks[b.kind].solid&&b.y===0){if(Math.abs(b.x)<1.1&&b.z>size-2||Math.hypot(parcel.x+b.x-g.position[0],parcel.z+b.z-g.position[1])<Math.max(bounds.w,bounds.d)/2+.6)return false;const obstacles=[...blocks.filter(a=>a.y===0&&data.blocks[a.kind].solid),b].map(blockBounds),free=(x:number,z:number)=>Math.abs(x)<size-.3&&Math.abs(z)<size-.3&&!obstacles.some(o=>Math.abs(x-o.x)<o.w/2+.32&&Math.abs(z-o.z)<o.d/2+.32);if(!findRoute([0,size-.7],[0,0],free,1400))return false;}return true;
+ if(data.blocks[b.kind].solid&&b.y===0){const facing=front(parcel),[ahead,side]=toFront(facing,b.x,b.z);if(Math.abs(side)<1.1&&ahead>size-2||Math.hypot(parcel.x+b.x-g.position[0],parcel.z+b.z-g.position[1])<Math.max(bounds.w,bounds.d)/2+.6)return false;const obstacles=[...blocks.filter(a=>a.y===0&&data.blocks[a.kind].solid),b].map(blockBounds),free=(x:number,z:number)=>Math.abs(x)<size-.3&&Math.abs(z)<size-.3&&!obstacles.some(o=>Math.abs(x-o.x)<o.w/2+.32&&Math.abs(z-o.z)<o.d/2+.32);if(!findRoute([facing.dir[0]*(size-.7),facing.dir[1]*(size-.7)],[0,0],free,1400))return false;}return true;
 }
 const copy=(g:Save)=>({...g,enterprise:structuredClone(enterpriseOf(g))});
 const clamp=(v:number)=>Math.max(0,Math.min(100,v));

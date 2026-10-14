@@ -4,7 +4,8 @@ import {useEffect,useRef} from 'react';
 import {furnitureDefaults,propertyBounds,roomFree} from './spatial';
 import {stopNavigation} from './navigation';
 import {Group,Vector3} from 'three';
-import {parcels,starterProperty,type Furniture} from '../shared/property';
+import {front,parcels,starterProperty,type Furniture} from '../shared/property';
+import {PropertyDamage} from './EmpireWorld';
 import {controls,useGame} from './game';
 import {Box,Sign,Person} from './SceneParts';
 import {Asset} from './GameModels';
@@ -12,7 +13,7 @@ import {effectiveProperty} from './simulation';
 import {cameraControl} from './camera';
 export function PropertyWorld() {
   const position=useGame(s=>s.game.position);const properties=useGame(s=>s.game.properties)??[starterProperty()];
-  return <>{parcels.filter(p=>p.id!=='house-yaba'&&Math.hypot(p.x-position[0],p.z-position[1])<72).map(p=>{const owned=properties.find(a=>a.id===p.id),kind=owned?.kind??(p.built?'house':'land');return <group key={p.id} position={[p.x,0,p.z]}>{kind==='land'?<><Box p={[0,.03,0]} s={[p.size??6,.08,p.size??6]} color="#9a8b62"/>{[-3,3].flatMap(x=>[-3,3].map(z=><Box key={`${x}-${z}`} p={[x,.4,z]} s={[.15,.8,.15]} color="#ede1b4"/>))}</>:<><Asset url={'/assets/models/'+(kind==='house'?'home-building-type-'+['a','c','e','g'][Math.abs(Math.round(p.x))%4]:'city-building-'+(kind==='club'?'d':kind==='church'?'f':'b'))+'.glb'} size={[6,3.8+(owned?.level??1)*.4,6]} fallback={<Box p={[0,2,0]} s={[6,4,6]} color="#b9ab8d"/>}/><Sign text={kind.toUpperCase()} position={[0,3.1,3.15]}/>{kind==='church'&&<><Box p={[0,4.8,0]} s={[.2,1.4,.2]} color="#eee4bb"/><Box p={[0,5,0]} s={[.8,.2,.2]} color="#eee4bb"/></>}</>}<Sign text={owned?'YOUR PROPERTY':'FOR SALE'} position={[0,1,(p.size??6)/2+1]} width={2.4}/></group>;})}</>;
+  return <>{parcels.filter(p=>p.id!=='house-yaba'&&Math.hypot(p.x-position[0],p.z-position[1])<72).map(p=>{const owned=properties.find(a=>a.id===p.id),kind=owned?.kind??(p.built?'house':'land');const facing=front(p);return <group key={p.id} position={[p.x,0,p.z]}><group rotation={[0,facing.yaw,0]}>{kind==='land'?<><Box p={[0,.03,0]} s={[p.size??6,.08,p.size??6]} color="#9a8b62"/>{[-3,3].flatMap(x=>[-3,3].map(z=><Box key={`${x}-${z}`} p={[x,.4,z]} s={[.15,.8,.15]} color="#ede1b4"/>))}</>:<><Asset url={'/assets/models/'+(kind==='house'?'home-building-type-'+['a','c','e','g'][Math.abs(Math.round(p.x))%4]:'city-building-'+(kind==='club'?'d':kind==='church'?'f':'b'))+'.glb'} size={[6,3.8+(owned?.level??1)*.4,6]} fallback={<Box p={[0,2,0]} s={[6,4,6]} color="#b9ab8d"/>}/><Sign text={kind.toUpperCase()} position={[0,3.1,3.15]}/>{kind==='church'&&<><Box p={[0,4.8,0]} s={[.2,1.4,.2]} color="#eee4bb"/><Box p={[0,5,0]} s={[.8,.2,.2]} color="#eee4bb"/></>}</>}<Sign text={owned?'YOUR PROPERTY':'FOR SALE'} position={[0,1,(p.size??6)/2+1]} width={2.4}/>{kind!=='land'&&<Box p={[0,.05,(p.size??6)/2-1.2]} s={[1.4,.06,2.4]} color="#a49c84"/>}</group><PropertyDamage id={p.id}/></group>;})}</>;
 }
 export function propertyObstacles() {
   const s=useGame.getState();return propertyBounds(s.game,s.driving);

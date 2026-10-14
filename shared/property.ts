@@ -1,4 +1,5 @@
-import { districts, blockers, streetObstacles, riverClear, type DistrictId } from './city';
+import { districts, blockers, streetObstacles, riverClear, canMove, type DistrictId } from './city';
+import { usableFacing, type Facing } from './roads';
 
 export const buildTypes = { house: { name: 'House', price: 9000 }, club: { name: 'Club', price: 16000 }, church: { name: 'Church', price: 12000 }, shop: { name: 'Shop', price: 7000 } };
 export type BuildKind = keyof typeof buildTypes;
@@ -18,7 +19,11 @@ parcels[0] = { ...parcels[0], x: -9, z: -4, price:12000 };
 for(let z=-148;z<23;z+=8)for(let x=-140;x<141;x+=8){if([-100,0,100].some(r=>Math.abs(x-r)<11)||[-86,14,-60].some(r=>Math.abs(z-r)<9)||[...blockers,...streetObstacles,...parcels.map(p=>({...p,w:p.size??8,d:p.size??8}))].some(b=>Math.abs(x-b.x)<b.w/2+4.2&&Math.abs(z-b.z)<b.d/2+4.2))continue;const d=[...districts].sort((a,b)=>Math.hypot(a.x-x,a.z-z)-Math.hypot(b.x-x,b.z-z))[0],zone=x<-110?'industrial':z<-125?'village':d.id==='vi'?'city':'town';parcels.push({id:`infill-${x}-${z}`,district:d.id,name:`${d.name} ${zone} small plot ${parcels.length}`,x,z,price:zone==='city'?6000:zone==='village'?1500:3000,built:false,size:8,zone});}
 const housingNames=['Shared room','Single-room apartment','Self-contained apartment','Mini flat','One-bedroom apartment','Two-bedroom apartment','Three-bedroom apartment','Duplex','Luxury villa','Mansion','Penthouse','Estate property'];const housingLots=parcels.filter(p=>!p.built).slice(0,12);housingLots.forEach((p,i)=>{p.built=true;p.housing=i+1;p.name=`${housingNames[i]} · ${districts.find(d=>d.id===p.district)!.name}`;p.price=5000+i*i*3500;});
 export const starterProperty = (): Property => ({ id: 'house-yaba', kind: 'house', furniture: ['bed','sofa','tv','kitchen'], level: 1 });
-export const entrance = (p: typeof parcels[number]): [number,number] => p.id==='house-yaba'?[-6,-3]:[p.x,p.z+(p.size??6)/2+1.5];
+const fronts=new Map<string,Facing>();
+const reach=(p:Parcel)=>(p.size??6)/2+1.5;
+/** Every building faces its nearest reachable road; the starter apartment keeps its original door. */
+export const front=(p:Parcel):Facing=>{if(p.id==='house-yaba')return {yaw:0,dir:[0,1],distance:0};let f=fronts.get(p.id);if(!f){f=usableFacing(p.x,p.z,reach(p),canMove);fronts.set(p.id,f);}return f;};
+export const entrance = (p: Parcel): [number,number] => {if(p.id==='house-yaba')return [-6,-3];const f=front(p);return [p.x+f.dir[0]*reach(p),p.z+f.dir[1]*reach(p)];};
 export const propertyDistrict = (id: string): DistrictId => parcels.find(p=>p.id===id)?.district??'yaba';
 export function validProperties(value: unknown): value is Property[] {
   return Array.isArray(value) && value.length<=parcels.length && new Set(value.map(p=>p?.id)).size===value.length && value.every(p=>p && parcels.some(a=>a.id===p.id) && (p.kind==='land'||Object.hasOwn(buildTypes,p.kind)) && Number.isInteger(p.level)&&p.level>=1&&p.level<=12 && Array.isArray(p.furniture)&&p.furniture.every((f:unknown)=>typeof f==='string'&&Object.hasOwn(furnishings,f))&&new Set(p.furniture).size===p.furniture.length && (p.placements===undefined||p.placements&&typeof p.placements==='object'&&!Array.isArray(p.placements)&&Object.entries(p.placements).every(([key,raw])=>{const t=raw as Placement;return p.furniture.includes(key)&&t&&[t.x,t.z,t.rotation].every(Number.isFinite)&&Math.abs(t.x)<=3&&Math.abs(t.z)<=3;}))&&(p.decor===undefined||p.decor&&typeof p.decor==='object'&&Object.entries(p.decor).every(([key,value])=>['paint','floor','door','window'].includes(key)&&typeof value==='string'&&/^#[0-9a-f]{6}$/i.test(value)))&&(p.walls===undefined||Array.isArray(p.walls)&&p.walls.length<=12&&p.walls.every((w:RoomWall)=>w&&[w.x,w.z,w.length].every(Number.isFinite)&&Math.abs(w.x)<=3&&Math.abs(w.z)<=3&&w.length>0&&w.length<=6&&['x','z'].includes(w.axis))));

@@ -1,0 +1,53 @@
+{
+  "defenses": {
+    "fence": {"name": "Perimeter fence & razor wire", "cost": 4000, "power": 6, "upkeep": 0},
+    "gate": {"name": "Steel gate", "cost": 5000, "power": 8, "upkeep": 0},
+    "bars": {"name": "Burglary-proof window bars", "cost": 3000, "power": 5, "upkeep": 0},
+    "cctv": {"name": "CCTV cameras & recorder", "cost": 6000, "power": 7, "upkeep": 0, "powered": true},
+    "floodlight": {"name": "Security floodlights", "cost": 2500, "power": 4, "upkeep": 0, "powered": true},
+    "alarm": {"name": "Siren alarm", "cost": 3500, "power": 5, "upkeep": 0, "powered": true},
+    "dogs": {"name": "Guard dogs (Boerboel)", "cost": 7000, "power": 9, "upkeep": 700},
+    "gateman": {"name": "Mai-guard (gateman)", "cost": 8000, "power": 10, "upkeep": 2500},
+    "solar": {"name": "Solar inverter & batteries", "cost": 15000, "power": 0, "upkeep": 0}
+  },
+  "mods": {
+    "engine": {"name": "Engine tune", "cost": 8000, "max": 3},
+    "tires": {"name": "Performance tyres", "cost": 4000, "max": 3},
+    "suspension": {"name": "Suspension kit", "cost": 5000, "max": 3},
+    "armor": {"name": "Armour plating", "cost": 12000, "max": 3},
+    "tracker": {"name": "GPS tracker", "cost": 6000, "max": 1},
+    "tint": {"name": "Window tint", "cost": 2500, "max": 1}
+  },
+  "raids": {
+    "burglars": {"name": "Burglars", "strength": 22, "attackers": 2, "night": true},
+    "omo-onile": {"name": "Omo Onile land grabbers", "strength": 28, "attackers": 4, "night": false, "settlement": 15000},
+    "car-snatchers": {"name": "Car snatchers", "strength": 26, "attackers": 2, "night": true},
+    "rival-thugs": {"name": "Rival's thugs", "strength": 38, "attackers": 4, "night": true, "settlement": 25000},
+    "armed-robbers": {"name": "Armed robbers", "strength": 52, "attackers": 5, "night": true}
+  },
+  "crime": {"yaba": 1, "ikorodu": 1.15, "ikeja": 0.9, "vi": 0.75, "mainland": 1.2, "lekki": 0.85},
+  "police": {"yaba": 18, "ikorodu": 12, "ikeja": 30, "vi": 24, "mainland": 14, "lekki": 20},
+  "rivals": [
+    {"id": "balogun", "name": "Chief Balogun Holdings", "district": "mainland", "trade": "property", "wealth": 2500000},
+    {"id": "danjuma", "name": "Alhaji Danjuma Transport", "district": "ikeja", "trade": "transport", "wealth": 1800000},
+    {"id": "ngozi", "name": "Madam Ngozi Ventures", "district": "lekki", "trade": "retail", "wealth": 2100000}
+  ],
+  "animals": {
+    "goat": {"name": "West African Dwarf goats", "housing": "pen", "capacity": 15, "price": 15000, "days": 240, "sale": 45000, "feed": 0.8, "breed": 150, "festival": {"12": 1.6, "6": 1.4}},
+    "ram": {"name": "Balami rams", "housing": "pen", "capacity": 10, "price": 25000, "days": 300, "sale": 90000, "feed": 1.2, "breed": 0, "festival": {"6": 2}},
+    "pig": {"name": "Large White pigs", "housing": "piggery", "capacity": 12, "price": 12000, "days": 180, "sale": 60000, "feed": 2, "breed": 115, "festival": {"12": 1.3}},
+    "catfish": {"name": "Clarias catfish", "housing": "fishpond", "capacity": 800, "price": 60, "days": 120, "sale": 1500, "feed": 0.02, "breed": 0, "festival": {}},
+    "tilapia": {"name": "Tilapia", "housing": "fishpond", "capacity": 800, "price": 40, "days": 150, "sale": 900, "feed": 0.015, "breed": 0, "festival": {}},
+    "snail": {"name": "Giant African land snails", "housing": "snailery", "capacity": 300, "price": 300, "days": 300, "sale": 1500, "feed": 0.005, "breed": 0, "humid": true, "festival": {}},
+    "rabbit": {"name": "New Zealand White rabbits", "housing": "hutch", "capacity": 30, "price": 3000, "days": 120, "sale": 8000, "feed": 0.15, "breed": 31, "festival": {}},
+    "guinea-fowl": {"name": "Guinea fowl", "housing": "poultry", "capacity": 200, "price": 1500, "days": 120, "sale": 6000, "feed": 0.1, "breed": 0, "festival": {"12": 1.3}}
+  },
+  "titles": [
+    {"worth": 0, "name": "Street hustler"},
+    {"worth": 1500000, "name": "Small business owner"},
+    {"worth": 3000000, "name": "Oga at the top"},
+    {"worth": 6000000, "name": "Chairman"},
+    {"worth": 12000000, "name": "Big man of Lagos"},
+    {"worth": 25000000, "name": "Odogwu"}
+  ]
+}

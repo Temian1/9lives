@@ -3,7 +3,7 @@ import {useEffect} from 'react';
 import {Plane,Raycaster,Vector2,Vector3} from 'three';
 import {controls,useGame} from './game';
 import {navigateTo,stopNavigation} from './navigation';
-export const cameraControl = { yaw: .665, pitch: .72, distance: 34, insideYaw: 0, insidePitch: 0,sensitivity:1 };
+export const cameraControl = { yaw: .665, pitch: .72, distance: 34, insideYaw: 0, insidePitch: 0,sensitivity:1,shake:0 };
 export function CameraGestures() {
   const canvas=useThree(s=>s.gl.domElement),camera=useThree(s=>s.camera),scene=useThree(s=>s.scene);
   useEffect(()=>{

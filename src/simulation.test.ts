@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {fresh,validSave,useGame,controls} from './game';
 import {simulate,simulationDay,salePrice} from './simulation';
 import {locations,districts} from '../shared/city';
+import {entrance as doorOf,parcels as allParcels} from '../shared/property';
 test('new campaigns get one million naira and hospital lives require location, money and capacity',()=>{
  let g=fresh();assert.equal(g.money,1000000);g.lives=8;assert.equal(simulate(g,'buy-life').game.lives,8);
  const hospital=locations.find(l=>l.type==='hospital')!;g.position=[hospital.x,hospital.z];g=simulate(g,'buy-life').game;assert.equal(g.lives,9);assert.equal(g.money,975000);assert.equal(simulate(g,'buy-life').game.money,975000);g.lives=0;assert.equal(simulate(g,'buy-life').game.lives,0);
@@ -27,5 +28,5 @@ test('buying a rented home ends its lease and resale cannot generate cash from a
  const g=simulate(fresh(),'rent','house-ikorodu').game,deposit=g.sim!.leases[0].deposit;useGame.setState({game:g,ride:null});useGame.getState().propertyAction('house-ikorodu','buy');const purchased=useGame.getState().game;assert.equal(purchased.sim!.leases.length,0);assert.equal(purchased.money,g.money-16000+deposit);const sold=simulate(fresh(),'sell-property','house-yaba').game;useGame.setState({game:sold});useGame.getState().propertyAction('house-yaba','buy');const bought=useGame.getState().game;const again=simulate(bought,'sell-property','house-yaba').game;assert.ok(again.money<sold.money);
 });
 test('purchased clubs can be entered and furnished and saved furniture coordinates validate',()=>{
- const g=fresh();g.properties!.push({id:'plot-yaba',kind:'club',level:1,furniture:[]});useGame.setState({game:g,ride:null});useGame.getState().propertyAction('plot-yaba','sofa');assert.ok(useGame.getState().game.properties!.find(p=>p.id==='plot-yaba')!.furniture.includes('sofa'));controls.position=[20,-14.5];useGame.getState().propertyAction('plot-yaba','enter');assert.equal(useGame.getState().game.interior,'plot-yaba');useGame.getState().placeFurniture('plot-yaba','sofa',1,1,2);assert.equal(validSave(useGame.getState().game),true);
+ const g=fresh();g.properties!.push({id:'plot-yaba',kind:'club',level:1,furniture:[]});useGame.setState({game:g,ride:null});useGame.getState().propertyAction('plot-yaba','sofa');assert.ok(useGame.getState().game.properties!.find(p=>p.id==='plot-yaba')!.furniture.includes('sofa'));controls.position=doorOf(allParcels.find(p=>p.id==='plot-yaba')!);useGame.getState().propertyAction('plot-yaba','enter');assert.equal(useGame.getState().game.interior,'plot-yaba');useGame.getState().placeFurniture('plot-yaba','sofa',1,1,2);assert.equal(validSave(useGame.getState().game),true);
 });
